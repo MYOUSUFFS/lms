@@ -126,12 +126,11 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           ChatInput(
             onSend: (message) {
               // Auto-enable RAG when documents exist for better experience
-              final shouldUseRag = documentProvider.hasDocuments || settingsProvider.useRag;
-              
+              final shouldUseRag =
+                  documentProvider.hasDocuments || settingsProvider.useRag;
+
               if (!chatProvider.hasConversation) {
-                chatProvider.createNewConversation(
-                  useRag: shouldUseRag,
-                );
+                chatProvider.createNewConversation(useRag: shouldUseRag);
               }
               if (settingsProvider.useStreaming) {
                 chatProvider.sendMessageStreaming(
@@ -139,10 +138,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                   useRag: shouldUseRag,
                 );
               } else {
-                chatProvider.sendMessage(
-                  message,
-                  useRag: shouldUseRag,
-                );
+                chatProvider.sendMessage(message, useRag: shouldUseRag);
               }
             },
             isLoading: chatProvider.isLoading,
@@ -256,18 +252,18 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           Tooltip(
             message: documentProvider.hasDocuments
                 ? (settingsProvider.useRag
-                    ? 'RAG enabled - AI uses your documents'
-                    : 'RAG disabled - Click to use documents')
+                      ? 'RAG enabled - AI uses your documents'
+                      : 'RAG disabled - Click to use documents')
                 : 'Upload documents to enable RAG',
             child: IconButton(
               icon: Icon(
                 documentProvider.hasDocuments && settingsProvider.useRag
                     ? Icons.library_books
                     : documentProvider.hasDocuments
-                        ? Icons.library_books_outlined
-                        : Icons.chat_bubble_outline,
-                color: documentProvider.hasDocuments && settingsProvider.useRag 
-                    ? AppTheme.primaryColor 
+                    ? Icons.library_books_outlined
+                    : Icons.chat_bubble_outline,
+                color: documentProvider.hasDocuments && settingsProvider.useRag
+                    ? AppTheme.primaryColor
                     : null,
               ),
               onPressed: () => settingsProvider.toggleRag(),
@@ -500,20 +496,18 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     SettingsProvider settingsProvider,
   ) {
     final documentProvider = context.read<DocumentProvider>();
-    
+
     return ActionChip(
       avatar: Icon(icon, size: 18),
       label: Text(prompt),
       onPressed: () {
         // Auto-enable RAG when documents exist for better experience
-        final shouldUseRag = documentProvider.hasDocuments || settingsProvider.useRag;
-        
+        final shouldUseRag =
+            documentProvider.hasDocuments || settingsProvider.useRag;
+
         chatProvider.createNewConversation(useRag: shouldUseRag);
         if (settingsProvider.useStreaming) {
-          chatProvider.sendMessageStreaming(
-            prompt,
-            useRag: shouldUseRag,
-          );
+          chatProvider.sendMessageStreaming(prompt, useRag: shouldUseRag);
         } else {
           chatProvider.sendMessage(prompt, useRag: shouldUseRag);
         }
