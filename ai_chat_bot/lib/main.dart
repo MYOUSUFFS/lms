@@ -1,20 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/services/api_service.dart';
+import 'core/services/storage_service.dart';
+import 'core/providers/settings_provider.dart';
+import 'core/providers/chat_provider.dart';
+import 'features/chat/screens/chat_screen.dart';
 
-void main() {
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize services
+  final storageService = StorageService();
+  await storageService.init();
+
+  // Load saved settings
+  final apiKey = await storageService.getApiKey();
+  final baseUrl = await storageService.getBaseUrl();
+
+  final apiService = ApiService(apiKey: apiKey, baseUrl: baseUrl);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => SettingsProvider(storageService)..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChatProvider(apiService, storageService)..init(),
+        ),
+      ],
+      child: const AIChatBotApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class AIChatBotApp extends StatelessWidget {
+  const AIChatBotApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    final settings = context.watch<SettingsProvider>();
+
+    return MaterialApp(
+      title: 'LMS AI Assistant',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: settings.themeMode,
+      home: const ChatScreen(),
     );
   }
 }
