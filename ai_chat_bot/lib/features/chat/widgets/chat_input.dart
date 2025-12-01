@@ -38,12 +38,16 @@ class _ChatInputState extends State<ChatInput> {
   }
 
   void _handleSend() {
-    final text = _controller.text.trim();
+    // Remove trailing newlines/spaces that might have been added by Enter key
+    String text = _controller.text.trimRight();
+    // Also remove any leading/trailing whitespace
+    text = text.trim();
+
     if (text.isEmpty || widget.isLoading) return;
 
     widget.onSend(text);
-    _controller.clear();
     _focusNode.requestFocus();
+    _controller.clear();
   }
 
   @override
@@ -62,52 +66,53 @@ class _ChatInputState extends State<ChatInput> {
           children: [
             // Text input
             Expanded(
-              child: Container(
-                constraints: const BoxConstraints(maxHeight: 150),
-                decoration: BoxDecoration(
-                  color: theme.inputDecorationTheme.fillColor,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: _focusNode.hasFocus
-                        ? AppTheme.primaryColor
-                        : theme.dividerColor,
-                    width: _focusNode.hasFocus ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: KeyboardListener(
-                        focusNode: FocusNode(),
-                        onKeyEvent: (event) {
-                          if (event is KeyDownEvent &&
-                              event.logicalKey == LogicalKeyboardKey.enter &&
-                              !HardwareKeyboard.instance.isShiftPressed) {
-                            _handleSend();
-                          }
-                        },
-                        child: TextField(
-                          controller: _controller,
-                          focusNode: _focusNode,
-                          maxLines: null,
-                          textInputAction: TextInputAction.newline,
-                          decoration: const InputDecoration(
-                            hintText: 'Type a message...',
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Focus(
+                      onKeyEvent: (node, event) {
+                        // Handle Enter key to send message (without Shift)
+                        if (event is KeyDownEvent &&
+                            event.logicalKey == LogicalKeyboardKey.enter &&
+                            !HardwareKeyboard.instance.isShiftPressed) {
+                          _handleSend();
+                          // Return handled to prevent newline from being added
+                          return KeyEventResult.handled;
+                        }
+                        return KeyEventResult.ignored;
+                      },
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        maxLines: 5,
+                        minLines: 1,
+                        textInputAction: TextInputAction.newline,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: 'Type a message...',
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide(color: theme.dividerColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide(
+                              color: AppTheme.primaryColor,
                             ),
                           ),
-                          onSubmitted: (_) => _handleSend(),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
