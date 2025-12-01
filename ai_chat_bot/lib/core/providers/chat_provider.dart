@@ -193,15 +193,15 @@ class ChatProvider extends ChangeNotifier {
     if (_currentConversation == null) return [];
 
     final allMessages = _currentConversation!.messages;
-    
+
     // Exclude the last message (which is the current user message just added)
     // This prevents sending the current question as part of history
-    final historyMessages = allMessages.length > 1 
+    final historyMessages = allMessages.length > 1
         ? allMessages.sublist(0, allMessages.length - 1)
         : <Message>[];
-    
+
     // Take the last 20 messages for better context memory
-    final recentMessages = historyMessages.length > 20 
+    final recentMessages = historyMessages.length > 20
         ? historyMessages.sublist(historyMessages.length - 20)
         : historyMessages;
 
