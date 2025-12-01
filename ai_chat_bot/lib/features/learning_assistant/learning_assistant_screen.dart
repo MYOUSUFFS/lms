@@ -125,20 +125,23 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           // Chat input - always visible
           ChatInput(
             onSend: (message) {
+              // Auto-enable RAG when documents exist for better experience
+              final shouldUseRag = documentProvider.hasDocuments || settingsProvider.useRag;
+              
               if (!chatProvider.hasConversation) {
                 chatProvider.createNewConversation(
-                  useRag: settingsProvider.useRag,
+                  useRag: shouldUseRag,
                 );
               }
               if (settingsProvider.useStreaming) {
                 chatProvider.sendMessageStreaming(
                   message,
-                  useRag: settingsProvider.useRag,
+                  useRag: shouldUseRag,
                 );
               } else {
                 chatProvider.sendMessage(
                   message,
-                  useRag: settingsProvider.useRag,
+                  useRag: shouldUseRag,
                 );
               }
             },
@@ -207,14 +210,22 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                 ),
                 Row(
                   children: [
-                    if (documentProvider.hasDocuments)
+                    if (documentProvider.hasDocuments) ...[
                       Text(
                         '${documentProvider.documentCount} documents',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.successColor,
                         ),
                       ),
-                    if (documentProvider.hasDocuments) const SizedBox(width: 8),
+                      const SizedBox(width: 6),
+                      Text(
+                        '•',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.dividerColor,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                     Container(
                       width: 6,
                       height: 6,
@@ -243,15 +254,21 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
           // RAG toggle
           Tooltip(
-            message: settingsProvider.useRag
-                ? 'Using document context (RAG)'
-                : 'Direct chat mode',
+            message: documentProvider.hasDocuments
+                ? (settingsProvider.useRag
+                    ? 'RAG enabled - AI uses your documents'
+                    : 'RAG disabled - Click to use documents')
+                : 'Upload documents to enable RAG',
             child: IconButton(
               icon: Icon(
-                settingsProvider.useRag
+                documentProvider.hasDocuments && settingsProvider.useRag
                     ? Icons.library_books
-                    : Icons.chat_bubble_outline,
-                color: settingsProvider.useRag ? AppTheme.primaryColor : null,
+                    : documentProvider.hasDocuments
+                        ? Icons.library_books_outlined
+                        : Icons.chat_bubble_outline,
+                color: documentProvider.hasDocuments && settingsProvider.useRag 
+                    ? AppTheme.primaryColor 
+                    : null,
               ),
               onPressed: () => settingsProvider.toggleRag(),
             ),
@@ -482,18 +499,23 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     ChatProvider chatProvider,
     SettingsProvider settingsProvider,
   ) {
+    final documentProvider = context.read<DocumentProvider>();
+    
     return ActionChip(
       avatar: Icon(icon, size: 18),
       label: Text(prompt),
       onPressed: () {
-        chatProvider.createNewConversation(useRag: settingsProvider.useRag);
+        // Auto-enable RAG when documents exist for better experience
+        final shouldUseRag = documentProvider.hasDocuments || settingsProvider.useRag;
+        
+        chatProvider.createNewConversation(useRag: shouldUseRag);
         if (settingsProvider.useStreaming) {
           chatProvider.sendMessageStreaming(
             prompt,
-            useRag: settingsProvider.useRag,
+            useRag: shouldUseRag,
           );
         } else {
-          chatProvider.sendMessage(prompt, useRag: settingsProvider.useRag);
+          chatProvider.sendMessage(prompt, useRag: shouldUseRag);
         }
       },
     );
