@@ -28,7 +28,7 @@ class ApiService {
   Future<bool> checkHealth() async {
     try {
       final response = await http
-          .get(Uri.parse('$_baseUrl/health'))
+          .get(Uri.parse(ApiConstants.healthEndpoint))
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e) {
