@@ -1,0 +1,42 @@
+# FastAPI & Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# LLM & AI
+langchain==0.1.0
+langchain-community==0.0.12
+openai==1.6.1
+httpx==0.26.0
+
+# Vector Database
+chromadb==0.4.22
+
+# Embeddings
+sentence-transformers==2.2.2
+torch==2.1.2
+
+# Document Processing
+pymupdf==1.23.8
+beautifulsoup4==4.12.2
+lxml==5.1.0
+pandas==2.1.4
+openpyxl==3.1.2
+
+# OCR
+paddlepaddle==2.6.0
+paddleocr==2.7.0.3
+
+# Web Scraping
+requests==2.31.0
+
+# Utilities
+python-dotenv==1.0.0
+aiofiles==23.2.1
+tenacity==8.2.3
+
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4

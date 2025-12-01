@@ -1,0 +1,53 @@
+# ===========================================
+# LMS RAG Backend - Docker Compose (Development)
+# Lightweight setup for local development
+# ===========================================
+
+version: "3.8"
+
+services:
+  # ===========================================
+  # Main API Service (Development)
+  # ===========================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lms-rag-api-dev
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=development
+      - DEBUG=true
+      - API_KEY=dev-api-key-12345
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3:8b
+      - EMBEDDING_MODEL=BAAI/bge-base-en-v1.5 # Smaller model for dev
+      - CHROMA_PERSIST_DIRECTORY=/app/data/chroma_db
+      - UPLOAD_DIRECTORY=/app/data/uploads
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./app:/app/app:ro # Mount source for development
+      - chroma_data_dev:/app/data/chroma_db
+      - uploads_data_dev:/app/data/uploads
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - lms-network-dev
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  chroma_data_dev:
+    driver: local
+  uploads_data_dev:
+    driver: local
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  lms-network-dev:
+    driver: bridge
