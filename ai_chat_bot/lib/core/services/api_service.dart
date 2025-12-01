@@ -134,6 +134,7 @@ class ApiService {
     List<Map<String, String>>? conversationHistory,
     String? systemPrompt,
   }) async* {
+    final client = http.Client();
     try {
       final body = {
         'message': message,
@@ -146,24 +147,29 @@ class ApiService {
       request.headers.addAll(_headers);
       request.body = jsonEncode(body);
 
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await client.send(request);
 
       if (streamedResponse.statusCode == 200) {
-        await for (final chunk in streamedResponse.stream.transform(
-          utf8.decoder,
-        )) {
+        // Use a StringBuffer for proper stream handling
+        final buffer = StringBuffer();
+        await for (final bytes in streamedResponse.stream) {
+          final chunk = utf8.decode(bytes);
+          buffer.write(chunk);
           yield chunk;
         }
       } else {
-        yield 'Error: Failed to stream response';
+        yield 'Error: Failed to stream response (${streamedResponse.statusCode})';
       }
     } catch (e) {
       yield 'Error: ${e.toString()}';
+    } finally {
+      client.close();
     }
   }
 
   /// Stream RAG query response
   Stream<String> streamRagQuery({required String query, int topK = 5}) async* {
+    final client = http.Client();
     try {
       final body = {'query': query, 'top_k': topK};
 
@@ -171,19 +177,20 @@ class ApiService {
       request.headers.addAll(_headers);
       request.body = jsonEncode(body);
 
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await client.send(request);
 
       if (streamedResponse.statusCode == 200) {
-        await for (final chunk in streamedResponse.stream.transform(
-          utf8.decoder,
-        )) {
+        await for (final bytes in streamedResponse.stream) {
+          final chunk = utf8.decode(bytes);
           yield chunk;
         }
       } else {
-        yield 'Error: Failed to stream response';
+        yield 'Error: Failed to stream response (${streamedResponse.statusCode})';
       }
     } catch (e) {
       yield 'Error: ${e.toString()}';
+    } finally {
+      client.close();
     }
   }
 

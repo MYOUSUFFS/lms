@@ -7,7 +7,7 @@ class SettingsProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   String _apiKey = '';
   String _baseUrl = 'http://localhost:8000';
-  bool _useStreaming = false; // Disabled by default for web compatibility
+  bool _useStreaming = true; // Enabled by default for real-time streaming
   bool _useRag = false;
 
   SettingsProvider(this._storage);
