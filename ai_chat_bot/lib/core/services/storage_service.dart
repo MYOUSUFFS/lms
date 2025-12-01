@@ -4,7 +4,7 @@ import '../models/conversation.dart';
 
 class StorageService {
   static const String _conversationsKey = 'conversations';
-  static const String _settingsKey = 'settings';
+  // static const String _settingsKey = 'settings';
   static const String _apiKeyKey = 'api_key';
   static const String _baseUrlKey = 'base_url';
   static const String _themeKey = 'theme_mode';

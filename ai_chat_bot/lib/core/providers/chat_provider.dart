@@ -192,10 +192,20 @@ class ChatProvider extends ChangeNotifier {
   List<Map<String, String>> _buildConversationHistory() {
     if (_currentConversation == null) return [];
 
-    // Get last 10 messages for context
-    final messages = _currentConversation!.messages.take(10).toList();
+    final allMessages = _currentConversation!.messages;
+    
+    // Exclude the last message (which is the current user message just added)
+    // This prevents sending the current question as part of history
+    final historyMessages = allMessages.length > 1 
+        ? allMessages.sublist(0, allMessages.length - 1)
+        : <Message>[];
+    
+    // Take the last 20 messages for better context memory
+    final recentMessages = historyMessages.length > 20 
+        ? historyMessages.sublist(historyMessages.length - 20)
+        : historyMessages;
 
-    return messages
+    return recentMessages
         .map(
           (m) => {
             'role': m.role == MessageRole.user ? 'user' : 'assistant',

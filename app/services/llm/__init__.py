@@ -23,12 +23,12 @@ class BaseLLMProvider(ABC):
     """Abstract base class for LLM providers."""
     
     @abstractmethod
-    async def generate(self, prompt: str, system_prompt: str = None) -> str:
+    async def generate(self, prompt: str, system_prompt: str = None, messages: list = None) -> str:
         """Generate a response from the LLM."""
         pass
     
     @abstractmethod
-    async def generate_stream(self, prompt: str, system_prompt: str = None) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, prompt: str, system_prompt: str = None, messages: list = None) -> AsyncGenerator[str, None]:
         """Generate a streaming response from the LLM."""
         pass
     
@@ -67,18 +67,24 @@ class OllamaProvider(BaseLLMProvider):
             logger.debug(f"Ollama not available: {e}")
             return False
     
-    async def generate(self, prompt: str, system_prompt: str = None) -> str:
+    async def generate(self, prompt: str, system_prompt: str = None, messages: list = None) -> str:
         """Generate response using Ollama."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history for context
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        # Add current user message
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "stream": False,
         }
         
@@ -96,18 +102,24 @@ class OllamaProvider(BaseLLMProvider):
             logger.error(f"Ollama generation error: {e}")
             raise
     
-    async def generate_stream(self, prompt: str, system_prompt: str = None) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, prompt: str, system_prompt: str = None, messages: list = None) -> AsyncGenerator[str, None]:
         """Generate streaming response using Ollama."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history for context
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        # Add current user message
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "stream": True,
         }
         
@@ -161,18 +173,23 @@ class GroqProvider(BaseLLMProvider):
         """Check if Groq is available (has API key)."""
         return bool(self.api_key)
     
-    async def generate(self, prompt: str, system_prompt: str = None) -> str:
+    async def generate(self, prompt: str, system_prompt: str = None, messages: list = None) -> str:
         """Generate response using Groq."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "temperature": 0.7,
             "max_tokens": 2048,
         }
@@ -191,18 +208,23 @@ class GroqProvider(BaseLLMProvider):
             logger.error(f"Groq generation error: {e}")
             raise
     
-    async def generate_stream(self, prompt: str, system_prompt: str = None) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, prompt: str, system_prompt: str = None, messages: list = None) -> AsyncGenerator[str, None]:
         """Generate streaming response using Groq."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "temperature": 0.7,
             "max_tokens": 2048,
             "stream": True,
@@ -261,18 +283,23 @@ class TogetherProvider(BaseLLMProvider):
         """Check if Together AI is available."""
         return bool(self.api_key)
     
-    async def generate(self, prompt: str, system_prompt: str = None) -> str:
+    async def generate(self, prompt: str, system_prompt: str = None, messages: list = None) -> str:
         """Generate response using Together AI."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "temperature": 0.7,
             "max_tokens": 2048,
         }
@@ -291,18 +318,23 @@ class TogetherProvider(BaseLLMProvider):
             logger.error(f"Together AI generation error: {e}")
             raise
     
-    async def generate_stream(self, prompt: str, system_prompt: str = None) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, prompt: str, system_prompt: str = None, messages: list = None) -> AsyncGenerator[str, None]:
         """Generate streaming response using Together AI."""
-        messages = []
+        chat_messages = []
         
         if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+            chat_messages.append({"role": "system", "content": system_prompt})
         
-        messages.append({"role": "user", "content": prompt})
+        # Add conversation history
+        if messages:
+            for msg in messages:
+                chat_messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        chat_messages.append({"role": "user", "content": prompt})
         
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": chat_messages,
             "temperature": 0.7,
             "max_tokens": 2048,
             "stream": True,
@@ -400,6 +432,7 @@ Context will be provided in the user's message."""
         prompt: str,
         system_prompt: str = None,
         context: str = None,
+        messages: list = None,
     ) -> tuple[str, str]:
         """
         Generate a response.
@@ -408,6 +441,7 @@ Context will be provided in the user's message."""
             prompt: User prompt/question
             system_prompt: Optional system prompt
             context: Optional RAG context to include
+            messages: Optional conversation history for memory
             
         Returns:
             Tuple of (response, model_used)
@@ -429,7 +463,7 @@ Please answer based on the context provided above."""
         logger.info(f"Generating response with {provider_name}")
         
         try:
-            response = await provider.generate(full_prompt, system)
+            response = await provider.generate(full_prompt, system, messages)
             return response, provider_name
         except Exception as e:
             logger.warning(f"Provider {provider_name} failed: {e}")
@@ -437,7 +471,7 @@ Please answer based on the context provided above."""
             if provider == self.ollama and settings.use_cloud_fallback:
                 fallback, fallback_name = await self._get_cloud_fallback()
                 if fallback:
-                    response = await fallback.generate(full_prompt, system)
+                    response = await fallback.generate(full_prompt, system, messages)
                     return response, fallback_name
             raise
     
@@ -446,6 +480,7 @@ Please answer based on the context provided above."""
         prompt: str,
         system_prompt: str = None,
         context: str = None,
+        messages: list = None,
     ) -> AsyncGenerator[tuple[str, str], None]:
         """
         Generate a streaming response.
@@ -454,6 +489,7 @@ Please answer based on the context provided above."""
             prompt: User prompt
             system_prompt: Optional system prompt
             context: Optional RAG context
+            messages: Optional conversation history for memory
             
         Yields:
             Tuple of (chunk, model_used)
@@ -471,7 +507,7 @@ Please answer based on the context provided above."""
         
         system = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         
-        async for chunk in provider.generate_stream(full_prompt, system):
+        async for chunk in provider.generate_stream(full_prompt, system, messages):
             yield chunk, provider_name
     
     async def _get_cloud_fallback(self) -> tuple[Optional[BaseLLMProvider], str]:
