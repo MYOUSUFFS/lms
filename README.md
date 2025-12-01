@@ -1,8 +1,21 @@
-# 🎓 LMS RAG Backend
+# 🎓 LMS AI Assistant
 
-A production-ready **Retrieval-Augmented Generation (RAG)** backend for Learning Management Systems, built with **Python**, **FastAPI**, and a local-first LLM approach.
+A complete **AI-powered Learning Management System** featuring a beautiful Flutter chat interface and a production-ready **Retrieval-Augmented Generation (RAG)** backend, built with **Python**, **FastAPI**, **LangChain**, and a local-first LLM approach.
+
+![LMS AI Assistant](sample.png)
 
 ## 🚀 Features
+
+### 📱 Flutter Chat Application
+
+- **Modern Chat UI** - Clean, responsive design with dark/light mode
+- **Real-time Streaming** - Watch AI responses appear in real-time
+- **Conversation Memory** - AI remembers previous messages in the session
+- **Multi-platform** - iOS, Android, Web, macOS, Windows, Linux
+- **Markdown Support** - Rich text rendering with code highlighting
+- **Conversation History** - Save and manage multiple chat sessions
+
+### 🧠 Backend Features
 
 - **📄 Multi-format Document Processing**
 
@@ -17,6 +30,7 @@ A production-ready **Retrieval-Augmented Generation (RAG)** backend for Learning
 
   - Primary: Ollama (Llama 3, Mistral, Phi-3)
   - Fallback: Groq or Together AI (cloud)
+  - **LangChain Integration** - Advanced conversation memory
 
 - **🔍 Vector Search**
 
@@ -37,11 +51,26 @@ A production-ready **Retrieval-Augmented Generation (RAG)** backend for Learning
 
 ## 📋 Tech Stack
 
+### Frontend (Flutter)
+
+| Layer            | Technology        |
+| ---------------- | ----------------- |
+| Framework        | Flutter 3.8+      |
+| State Management | Provider          |
+| HTTP Client      | http package      |
+| Storage          | SharedPreferences |
+| UI Components    | Material Design 3 |
+| Markdown         | flutter_markdown  |
+| Fonts            | Google Fonts      |
+
+### Backend (Python)
+
 | Layer           | Technology                             |
 | --------------- | -------------------------------------- |
-| Language        | Python 3.10+                           |
+| Language        | Python 3.9+                            |
 | API Framework   | FastAPI                                |
 | LLM Engine      | Ollama (local) + Groq/Together (cloud) |
+| Memory          | LangChain ConversationBufferMemory     |
 | Embeddings      | BGE-Large (sentence-transformers)      |
 | Vector DB       | ChromaDB                               |
 | PDF Processing  | PyMuPDF                                |
@@ -53,7 +82,8 @@ A production-ready **Retrieval-Augmented Generation (RAG)** backend for Learning
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.9+
+- Flutter 3.8+ (for mobile/web app)
 - [Ollama](https://ollama.ai/) installed and running
 - Docker & Docker Compose (for production)
 
@@ -113,6 +143,21 @@ python -m app.main
 - **API Docs**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **Health Check**: http://localhost:8000/api/v1/health
+
+### 6. Run Flutter App (Optional)
+
+```bash
+cd ai_chat_bot
+
+# Get dependencies
+flutter pub get
+
+# Run on your platform
+flutter run -d chrome     # Web
+flutter run -d macos      # macOS
+flutter run -d ios        # iOS
+flutter run -d android    # Android
+```
 
 ## 🐳 Docker Deployment
 
@@ -193,8 +238,27 @@ curl -X POST "http://localhost:8000/api/v1/query/stream" \
 
 ```
 lms/
-├── app/
+├── ai_chat_bot/              # Flutter Chat Application
+│   ├── lib/
+│   │   ├── main.dart         # App entry point
+│   │   ├── core/
+│   │   │   ├── providers/    # State management
+│   │   │   ├── services/     # API & Storage
+│   │   │   ├── models/       # Data models
+│   │   │   └── theme/        # App theming
+│   │   └── features/
+│   │       └── chat/         # Chat feature
+│   │           ├── screens/  # Chat screen
+│   │           └── widgets/  # UI components
+│   ├── android/              # Android platform
+│   ├── ios/                  # iOS platform
+│   ├── web/                  # Web platform
+│   ├── macos/                # macOS platform
+│   ├── windows/              # Windows platform
+│   └── linux/                # Linux platform
+├── app/                      # Python Backend
 │   ├── api/                  # API routes
+│   │   ├── chat.py           # LangChain chat endpoints
 │   │   ├── documents.py      # Document upload/management
 │   │   ├── query.py          # RAG query endpoints
 │   │   └── health.py         # Health checks
@@ -203,21 +267,11 @@ lms/
 │   │   ├── security.py       # API key authentication
 │   │   └── logging.py        # Logging setup
 │   ├── schemas/              # Pydantic models
-│   ├── services/
-│   │   ├── processors/       # Document processors
-│   │   │   ├── pdf_processor.py
-│   │   │   ├── html_processor.py
-│   │   │   ├── csv_processor.py
-│   │   │   ├── ocr_processor.py
-│   │   │   └── web_scraper.py
-│   │   ├── rag/              # RAG pipeline
-│   │   │   ├── chunker.py    # Text chunking
-│   │   │   ├── embeddings.py # BGE embeddings
-│   │   │   ├── vector_store.py # ChromaDB
-│   │   │   └── pipeline.py   # Main RAG orchestrator
-│   │   └── llm/              # LLM service
-│   │       └── __init__.py   # Ollama + cloud providers
-│   └── main.py               # FastAPI app
+│   └── services/
+│       ├── langchain_chat.py # LangChain conversation service
+│       ├── processors/       # Document processors
+│       ├── rag/              # RAG pipeline
+│       └── llm/              # LLM providers
 ├── nginx/                    # Nginx configuration
 ├── docker-compose.yml        # Production deployment
 ├── docker-compose.dev.yml    # Development deployment
@@ -284,12 +338,15 @@ pytest --cov=app --cov-report=html
 
 ## 📈 Future Enhancements
 
+- [x] Conversation memory with LangChain
+- [x] Real-time streaming responses
+- [x] Cross-platform Flutter app
 - [ ] BGE-M3 for multilingual support
 - [ ] Qdrant as alternative vector store
-- [ ] Conversation memory
 - [ ] Document versioning
 - [ ] Advanced chunking strategies
 - [ ] Fine-tuning support
+- [ ] Voice input/output
 
 ## 📄 License
 
