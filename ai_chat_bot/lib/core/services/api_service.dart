@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import '../constants/api_constants.dart';
 import '../models/message.dart';
@@ -239,7 +240,7 @@ class ApiService {
           'file',
           fileBytes,
           filename: fileName,
-          contentType: http.MediaType(mimeTypeParts[0], mimeTypeParts[1]),
+          contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
         ),
       );
 

@@ -51,12 +51,14 @@ class DocumentProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Get file bytes
+      // Get file bytes - on web, bytes are required since path is not available
       final bytes = file.bytes;
       if (bytes == null) {
+        // On non-web platforms, we could read from path, but for simplicity
+        // we require bytes to be available (ensured by withData: true)
         return DocumentUploadResult(
           success: false,
-          message: 'Failed to read file bytes',
+          message: 'Failed to read file bytes. Please try again.',
         );
       }
 
@@ -64,8 +66,15 @@ class DocumentProvider extends ChangeNotifier {
       _uploadProgress = 0.3;
       notifyListeners();
 
+      // Get file path safely - on web, path is not available
+      String filePath = '';
+      if (!kIsWeb) {
+        // Only access path on non-web platforms
+        filePath = file.path ?? '';
+      }
+
       final result = await _apiService.uploadDocument(
-        filePath: file.path ?? '',
+        filePath: filePath,
         fileName: file.name,
         fileBytes: bytes,
         documentId: documentId,
