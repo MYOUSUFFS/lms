@@ -1,7 +1,7 @@
 /// API Constants for the LMS Chat Application
 class ApiConstants {
   // Base URL - Change this to your server address
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = 'http://192.168.0.13:8000';
 
   // API Version
   static const String apiVersion = 'v1';
