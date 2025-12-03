@@ -288,7 +288,6 @@ class _AddDocumentDialogState extends State<AddDocumentDialog>
   }
 
   Widget _buildPasteTextTab(BuildContext context, DocumentProvider provider) {
-    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -527,7 +526,7 @@ class _AddDocumentDialogState extends State<AddDocumentDialog>
       return;
     }
 
-    // TODO: Implement text document upload via API
+    // Todo: Implement text document upload via API
     // For now, show a message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

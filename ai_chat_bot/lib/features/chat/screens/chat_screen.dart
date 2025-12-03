@@ -53,7 +53,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 // Messages or welcome screen
                 Expanded(
-                  child: chatProvider.hasConversation
+                  child: chatProvider.hasConversation &&
+                          chatProvider.currentMessages.isNotEmpty
                       ? const MessageList()
                       : _buildWelcomeScreen(
                           context,

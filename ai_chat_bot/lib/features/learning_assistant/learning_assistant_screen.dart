@@ -127,7 +127,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
           // Main content area - Chat or Welcome/Upload prompt
           Expanded(
-            child: chatProvider.hasConversation
+            child: chatProvider.hasConversation &&
+                    chatProvider.currentMessages.isNotEmpty
                 ? const MessageList()
                 : _buildWelcomeWithUpload(context, documentProvider),
           ),
@@ -180,7 +181,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           if (!isWideScreen && !isMediumScreen)
             IconButton(
               icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
+              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
               tooltip: 'Chat History',
             ),
 
@@ -311,8 +312,16 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           if (!isWideScreen && !isMediumScreen)
             IconButton(
               icon: const Icon(Icons.folder_outlined),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              onPressed: () => _showDocumentsBottomSheet(context),
               tooltip: 'Documents',
+            ),
+
+          // Settings button (mobile)
+          if (!isWideScreen && !isMediumScreen)
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
+              tooltip: 'Settings',
             ),
         ],
       ),
@@ -522,6 +531,41 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           chatProvider.sendMessage(prompt, useRag: shouldUseRag);
         }
       },
+    );
+  }
+
+  void _showDocumentsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Documents panel
+              const Expanded(child: DocumentsPanel()),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
