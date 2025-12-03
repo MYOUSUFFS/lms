@@ -127,7 +127,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
           // Main content area - Chat or Welcome/Upload prompt
           Expanded(
-            child: chatProvider.hasConversation &&
+            child:
+                chatProvider.hasConversation &&
                     chatProvider.currentMessages.isNotEmpty
                 ? const MessageList()
                 : _buildWelcomeWithUpload(context, documentProvider),
