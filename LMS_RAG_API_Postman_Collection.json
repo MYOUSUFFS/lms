@@ -1,0 +1,1287 @@
+{
+    "info": {
+        "name": "LMS RAG Backend API",
+        "description": "Complete API collection for LMS RAG Backend with examples",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "1.0.0"
+    },
+    "auth": {
+        "type": "apikey",
+        "apikey": [
+            {
+                "key": "key",
+                "value": "X-API-Key",
+                "type": "string"
+            },
+            {
+                "key": "value",
+                "value": "{{api_key}}",
+                "type": "string"
+            },
+            {
+                "key": "in",
+                "value": "header",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Health & Status",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        },
+                        "description": "Comprehensive health check for all system components (Vector Store, LLM, Embeddings)"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Healthy",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "http://localhost:8000/health",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "health"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"status\": \"healthy\",\n  \"version\": \"1.0.0\",\n  \"timestamp\": \"2024-01-15T10:30:00\",\n  \"components\": {\n    \"vector_store\": {\n      \"status\": \"healthy\",\n      \"type\": \"chromadb\",\n      \"documents_count\": 15,\n      \"latency_ms\": 45.23\n    },\n    \"llm\": {\n      \"status\": \"healthy\",\n      \"available_models\": [\"llama2\", \"mistral\"],\n      \"current_model\": \"llama2\",\n      \"provider\": \"ollama\",\n      \"latency_ms\": 120.5\n    },\n    \"embeddings\": {\n      \"status\": \"healthy\",\n      \"model\": \"bge-base-en-v1.5\",\n      \"latency_ms\": 89.3\n    }\n  }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Root Info",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                ""
+                            ]
+                        },
+                        "description": "Get basic API information"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - API Info",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "http://localhost:8000/",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        ""
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"name\": \"LMS RAG Backend API\",\n  \"version\": \"1.0.0\",\n  \"status\": \"running\",\n  \"docs\": \"/docs\",\n  \"health\": \"/health\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "System Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/stats",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "stats"
+                            ]
+                        },
+                        "description": "Get system statistics and usage information"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Stats",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/stats",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "stats"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"documents\": 15,\n  \"chunks\": 342,\n  \"embedding_model\": \"bge-base-en-v1.5\",\n  \"llm_model\": \"llama2\",\n  \"chunk_size\": 512,\n  \"chunk_overlap\": 50\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Documents",
+            "item": [
+                {
+                    "name": "Upload Document",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "/path/to/document.pdf",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "document_id",
+                                    "value": "doc_001",
+                                    "type": "text",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/documents/upload",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "documents",
+                                "upload"
+                            ]
+                        },
+                        "description": "Upload and process a document (PDF, TXT, HTML, CSV, or image for OCR)"
+                    },
+                    "response": [
+                        {
+                            "name": "201 - Document Uploaded",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "file",
+                                            "type": "file",
+                                            "src": "example.pdf"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/upload",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "upload"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"document_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"filename\": \"document.pdf\",\n  \"document_type\": \"pdf\",\n  \"status\": \"completed\",\n  \"message\": \"Document processed successfully\",\n  \"chunks_created\": 42\n}"
+                        },
+                        {
+                            "name": "400 - Unsupported File Type",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "file",
+                                            "type": "file",
+                                            "src": "example.exe"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/upload",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "upload"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"detail\": \"Unsupported file type: exe. Allowed: pdf,txt,md,html,htm,csv,xlsx,xls,png,jpg,jpeg\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Scrape URL",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"url\": \"https://example.com/article\",\n  \"extract_links\": false,\n  \"max_depth\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/documents/scrape",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "documents",
+                                "scrape"
+                            ]
+                        },
+                        "description": "Scrape content from a URL and add to the knowledge base"
+                    },
+                    "response": [
+                        {
+                            "name": "201 - URL Scraped",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"url\": \"https://example.com/article\",\n  \"extract_links\": false,\n  \"max_depth\": 1\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/scrape",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "scrape"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"url\": \"https://example.com/article\",\n  \"document_id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"title\": \"Example Article Title\",\n  \"status\": \"completed\",\n  \"chunks_created\": 28,\n  \"message\": \"URL scraped and processed successfully\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "List All Documents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/documents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "documents"
+                            ]
+                        },
+                        "description": "Get a list of all documents in the knowledge base"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Documents List",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"documents\": [\n    {\n      \"document_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"filename\": \"python_guide.pdf\",\n      \"document_type\": \"pdf\",\n      \"status\": \"completed\",\n      \"chunks_count\": 42,\n      \"created_at\": \"2024-01-15T10:15:00\",\n      \"file_size_bytes\": 2048576\n    },\n    {\n      \"document_id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"filename\": \"tutorial.txt\",\n      \"document_type\": \"txt\",\n      \"status\": \"completed\",\n      \"chunks_count\": 18,\n      \"created_at\": \"2024-01-15T11:30:00\",\n      \"file_size_bytes\": 512000\n    }\n  ],\n  \"total\": 2\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Document Info",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/documents/550e8400-e29b-41d4-a716-446655440000",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "documents",
+                                "550e8400-e29b-41d4-a716-446655440000"
+                            ]
+                        },
+                        "description": "Get information about a specific document"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Document Info",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/550e8400-e29b-41d4-a716-446655440000",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "550e8400-e29b-41d4-a716-446655440000"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"document_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"filename\": \"python_guide.pdf\",\n  \"document_type\": \"pdf\",\n  \"status\": \"completed\",\n  \"chunks_count\": 42,\n  \"created_at\": \"2024-01-15T10:15:00\",\n  \"file_size_bytes\": 2048576\n}"
+                        },
+                        {
+                            "name": "404 - Not Found",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/invalid-id",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "invalid-id"
+                                    ]
+                                }
+                            },
+                            "status": "Not Found",
+                            "code": 404,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"detail\": \"Document not found: invalid-id\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete Document",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/documents/550e8400-e29b-41d4-a716-446655440000",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "documents",
+                                "550e8400-e29b-41d4-a716-446655440000"
+                            ]
+                        },
+                        "description": "Delete a document from the knowledge base"
+                    },
+                    "response": [
+                        {
+                            "name": "204 - Deleted",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/documents/550e8400-e29b-41d4-a716-446655440000",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "documents",
+                                        "550e8400-e29b-41d4-a716-446655440000"
+                                    ]
+                                }
+                            },
+                            "status": "No Content",
+                            "code": 204,
+                            "header": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Query & Search",
+            "item": [
+                {
+                    "name": "Query Knowledge Base",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"What is Python and what are its main features?\",\n  \"top_k\": 5,\n  \"include_sources\": true,\n  \"document_ids\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/query",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "query"
+                            ]
+                        },
+                        "description": "Ask a question and get an answer based on indexed documents"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Query Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"query\": \"What is Python and what are its main features?\",\n  \"top_k\": 5,\n  \"include_sources\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/query",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "query"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"query\": \"What is Python and what are its main features?\",\n  \"answer\": \"Python is a high-level, interpreted programming language known for its simplicity and readability. Main features include: 1) Easy-to-learn syntax that emphasizes code readability, 2) Dynamic typing, 3) Comprehensive standard library, 4) Support for multiple programming paradigms (OOP, functional, procedural), 5) Cross-platform compatibility, 6) Strong community support.\",\n  \"sources\": [\n    {\n      \"document_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"filename\": \"python_guide.pdf\",\n      \"chunk_id\": \"chunk_001\",\n      \"content\": \"Python is a high-level, interpreted programming language. It was created by Guido van Rossum and first released in 1991. Python's design philosophy emphasizes code readability with the use of significant indentation...\",\n      \"similarity_score\": 0.9234,\n      \"page_number\": 1\n    },\n    {\n      \"document_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"filename\": \"python_guide.pdf\",\n      \"chunk_id\": \"chunk_003\",\n      \"content\": \"Features of Python: Simple and readable syntax, Dynamic typing, Comprehensive standard library, Object-oriented, functional and procedural programming support...\",\n      \"similarity_score\": 0.8756,\n      \"page_number\": 5\n    }\n  ],\n  \"model_used\": \"llama2\",\n  \"processing_time_ms\": 1234.56\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Query with Streaming",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"Explain the concept of decorators in Python\",\n  \"top_k\": 3,\n  \"include_sources\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/query/stream",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "query",
+                                "stream"
+                            ]
+                        },
+                        "description": "Query with streaming LLM response"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Streaming Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"query\": \"Explain decorators in Python\",\n  \"top_k\": 3,\n  \"include_sources\": false\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/query/stream",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "query",
+                                        "stream"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "text/plain"
+                                }
+                            ],
+                            "body": "Decorators in Python are functions that modify the behavior of other functions or classes. They wrap a function with additional functionality without permanently modifying the original function. Here's how they work:\n\n1. A decorator is a function that takes another function as an argument\n2. It returns a new function that usually calls the original function\n3. The new function can add code before and/or after the original function\n\nExample:\n@my_decorator\ndef my_function():\n    pass\n\nThis is equivalent to:\nmy_function = my_decorator(my_function)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Search Only (No LLM)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"machine learning algorithms\",\n  \"top_k\": 10,\n  \"include_sources\": true,\n  \"document_ids\": [\"550e8400-e29b-41d4-a716-446655440002\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/query/search",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "query",
+                                "search"
+                            ]
+                        },
+                        "description": "Search for relevant documents without LLM generation"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Search Results",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"query\": \"machine learning algorithms\",\n  \"top_k\": 10,\n  \"include_sources\": true,\n  \"document_ids\": [\"550e8400-e29b-41d4-a716-446655440002\"]\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/query/search",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "query",
+                                        "search"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"query\": \"machine learning algorithms\",\n  \"results\": [\n    {\n      \"chunk_id\": \"ml_chunk_001\",\n      \"content\": \"Machine learning algorithms are computational methods that allow systems to learn and improve from experience. Major categories include supervised learning, unsupervised learning, and reinforcement learning...\",\n      \"metadata\": {\n        \"document_id\": \"550e8400-e29b-41d4-a716-446655440002\",\n        \"filename\": \"ml_guide.pdf\",\n        \"page_number\": 12\n      },\n      \"similarity_score\": 0.9567\n    },\n    {\n      \"chunk_id\": \"ml_chunk_005\",\n      \"content\": \"Supervised learning algorithms include linear regression, logistic regression, decision trees, random forests, and support vector machines. Each has different strengths and use cases...\",\n      \"metadata\": {\n        \"document_id\": \"550e8400-e29b-41d4-a716-446655440002\",\n        \"filename\": \"ml_guide.pdf\",\n        \"page_number\": 25\n      },\n      \"similarity_score\": 0.8934\n    }\n  ],\n  \"total\": 2\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Chat & Conversation",
+            "item": [
+                {
+                    "name": "Chat (Client-side History)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"message\": \"Can you summarize what we discussed about Python?\",\n  \"conversation_history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is Python?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Python is a high-level programming language known for its simplicity and readability.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Tell me about its features\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Python features include: easy syntax, dynamic typing, comprehensive standard library, and strong community support.\"\n    }\n  ],\n  \"system_prompt\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat"
+                            ]
+                        },
+                        "description": "Chat with AI that remembers conversation history (client-side)"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Chat Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"message\": \"Can you summarize what we discussed?\",\n  \"conversation_history\": [\n    {\"role\": \"user\", \"content\": \"What is Python?\"},\n    {\"role\": \"assistant\", \"content\": \"Python is a high-level programming language...\"}\n  ]\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/chat",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "chat"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"message\": \"Can you summarize what we discussed about Python?\",\n  \"answer\": \"Of course! We discussed the following about Python: 1) Python is a high-level programming language, 2) It's known for its simplicity and readability, 3) Key features include easy syntax, dynamic typing, comprehensive standard library, and strong community support. Python is excellent for beginners and professionals alike, supporting multiple programming paradigms and having extensive frameworks for web development, data science, and AI/ML.\",\n  \"model_used\": \"llama2\",\n  \"processing_time_ms\": 1567.89\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Chat (Server-side Session)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"message\": \"What was my first question?\",\n  \"session_id\": \"session_user_123\",\n  \"conversation_history\": null,\n  \"system_prompt\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat"
+                            ]
+                        },
+                        "description": "Chat with server-side memory (uses session_id)"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Chat with Memory",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"message\": \"What was my first question?\",\n  \"session_id\": \"session_user_123\"\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/chat",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "chat"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"message\": \"What was my first question?\",\n  \"answer\": \"Your first question in this session was: 'What is Python?'. You asked that at the beginning of our conversation, and we've been discussing Python's features, capabilities, and use cases ever since.\",\n  \"model_used\": \"llama2\",\n  \"processing_time_ms\": 890.45\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Chat Stream (Server-side Session)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"message\": \"Explain the relationship between our previous discussions\",\n  \"session_id\": \"session_user_123\",\n  \"conversation_history\": null,\n  \"system_prompt\": \"You are a helpful Python tutor. Provide clear, concise explanations.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/stream",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "stream"
+                            ]
+                        },
+                        "description": "Stream chat response with conversation memory"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Streaming Chat",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"message\": \"Explain the relationship\",\n  \"session_id\": \"session_user_123\",\n  \"system_prompt\": \"You are a helpful tutor.\"\n}"
+                                },
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/chat/stream",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "chat",
+                                        "stream"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "text/plain; charset=utf-8"
+                                }
+                            ],
+                            "body": "In our conversation, we've built a solid foundation of understanding about Python. First, we established what Python is - a high-level, easy-to-learn programming language. Then, we explored its key features like simple syntax, dynamic typing, and its rich standard library.\n\nThese foundational concepts connect to practical applications: the simplicity makes it great for beginners, the dynamic typing allows flexible coding, and the standard library provides ready-made tools for almost any task.\n\nUnderstanding these relationships helps you appreciate why Python is so popular in fields like data science, web development, and automation."
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Chat History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/history/session_user_123",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "history",
+                                "session_user_123"
+                            ]
+                        },
+                        "description": "Get the conversation history for a session"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - History",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/chat/history/session_user_123",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "chat",
+                                        "history",
+                                        "session_user_123"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"session_id\": \"session_user_123\",\n  \"history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is Python?\",\n      \"timestamp\": \"2024-01-15T10:00:00\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Python is a high-level programming language...\",\n      \"timestamp\": \"2024-01-15T10:00:15\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Tell me about its features\",\n      \"timestamp\": \"2024-01-15T10:01:00\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Python features include...\",\n      \"timestamp\": \"2024-01-15T10:01:30\"\n    }\n  ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Clear Session Memory",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-API-Key",
+                                "value": "{{api_key}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/memory/session_user_123",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "memory",
+                                "session_user_123"
+                            ]
+                        },
+                        "description": "Clear the conversation memory for a session"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Cleared",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "X-API-Key",
+                                        "value": "your-api-key-here",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "http://localhost:8000/api/v1/chat/memory/session_user_123",
+                                    "host": [
+                                        "localhost"
+                                    ],
+                                    "port": [
+                                        "8000"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "chat",
+                                        "memory",
+                                        "session_user_123"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Memory cleared for session session_user_123\"\n}"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "api_key",
+            "value": "your-api-key-here",
+            "type": "string"
+        }
+    ]
+}
