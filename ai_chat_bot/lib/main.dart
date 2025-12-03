@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/api_service.dart';
 import 'core/services/storage_service.dart';
@@ -9,6 +10,9 @@ import 'features/chat/screens/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure Google Fonts to use only cached fonts (no network requests)
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   // Initialize services
   final storageService = StorageService();
