@@ -38,6 +38,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 onNewChat: () => chatProvider.createNewConversation(
                   useRag: settingsProvider.useRag,
                 ),
+                onOpenSettings: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
               ),
             ),
 
@@ -91,6 +94,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     useRag: settingsProvider.useRag,
                   );
                   Navigator.pop(context);
+                },
+                onOpenSettings: () {
+                  Navigator.pop(context); // Close the drawer first
+                  _scaffoldKey.currentState?.openEndDrawer();
                 },
               ),
             )

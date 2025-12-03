@@ -6,8 +6,13 @@ import '../../../core/theme/app_theme.dart';
 
 class ChatSidebar extends StatelessWidget {
   final VoidCallback onNewChat;
+  final VoidCallback onOpenSettings;
 
-  const ChatSidebar({super.key, required this.onNewChat});
+  const ChatSidebar({
+    super.key,
+    required this.onNewChat,
+    required this.onOpenSettings,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +53,20 @@ class ChatSidebar extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      'LMS Chat',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        'LMS Chat',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: onOpenSettings,
+                      icon: const Icon(Icons.settings_outlined),
+                      tooltip: 'Settings',
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
                       ),
                     ),
                   ],

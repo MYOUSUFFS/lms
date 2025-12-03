@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../chat/widgets/message_list.dart';
 import '../chat/widgets/chat_input.dart';
 import '../chat/widgets/chat_sidebar.dart';
+import '../chat/widgets/settings_drawer.dart';
 import '../documents/widgets/documents_panel.dart';
 import '../documents/widgets/add_document_dialog.dart';
 
@@ -21,6 +22,7 @@ class LearningAssistantScreen extends StatefulWidget {
 }
 
 class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _showChatHistory = true;
   bool _showDocuments = true;
 
@@ -38,6 +40,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
         isWideScreen || (isMediumScreen && _showDocuments && !_showChatHistory);
 
     return Scaffold(
+      key: _scaffoldKey,
       body: Row(
         children: [
           // Left Panel - Chat History
@@ -49,6 +52,9 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                   chatProvider.createNewConversation(
                     useRag: settingsProvider.useRag,
                   );
+                },
+                onOpenSettings: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
                 },
               ),
             ),
@@ -77,12 +83,16 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                   );
                   Navigator.pop(context);
                 },
+                onOpenSettings: () {
+                  Navigator.pop(context);
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
               ),
             )
           : null,
 
-      // Mobile drawer for documents
-      endDrawer: !isMediumScreen ? const Drawer(child: DocumentsPanel()) : null,
+      // Settings drawer (and documents on mobile)
+      endDrawer: const SettingsDrawer(),
     );
   }
 
