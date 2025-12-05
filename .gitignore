@@ -121,7 +121,6 @@ data/
 
 # Model cache
 .cache/
-models/
 
 # Uploads
 uploads/
