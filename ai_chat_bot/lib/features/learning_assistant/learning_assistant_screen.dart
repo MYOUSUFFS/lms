@@ -137,9 +137,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           // Chat input - always visible
           ChatInput(
             onSend: (message) {
-              // Auto-enable RAG when documents exist for better experience
-              final shouldUseRag =
-                  documentProvider.hasDocuments || settingsProvider.useRag;
+              // Use the user's RAG setting from settings
+              final shouldUseRag = settingsProvider.useRag;
 
               if (!chatProvider.hasConversation) {
                 chatProvider.createNewConversation(useRag: shouldUseRag);
@@ -515,15 +514,12 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     ChatProvider chatProvider,
     SettingsProvider settingsProvider,
   ) {
-    final documentProvider = context.read<DocumentProvider>();
-
     return ActionChip(
       avatar: Icon(icon, size: 18),
       label: Text(prompt),
       onPressed: () {
-        // Auto-enable RAG when documents exist for better experience
-        final shouldUseRag =
-            documentProvider.hasDocuments || settingsProvider.useRag;
+        // Use the user's RAG setting from settings
+        final shouldUseRag = settingsProvider.useRag;
 
         chatProvider.createNewConversation(useRag: shouldUseRag);
         if (settingsProvider.useStreaming) {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/models/document.dart';
 import '../../../core/providers/document_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import 'screens/document_viewer_screen.dart';
 
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key});
@@ -377,7 +378,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             ),
           ],
         ),
-        onTap: () => _showDocumentDetails(context, document),
+        onTap: () {
+          // Navigate to document viewer
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DocumentViewerScreen(document: document),
+            ),
+          );
+        },
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/models/document.dart';
 import '../../../core/providers/document_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../screens/document_viewer_screen.dart';
 import 'add_document_dialog.dart';
 
 /// Left panel showing list of documents with search and add functionality
@@ -269,7 +270,17 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
             : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
-          onTap: () => widget.onDocumentSelected?.call(document),
+          onTap: () {
+            // Open document viewer
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DocumentViewerScreen(document: document),
+              ),
+            );
+            // Also notify selection callback if provided
+            widget.onDocumentSelected?.call(document);
+          },
           borderRadius: BorderRadius.circular(10),
           child: Container(
             padding: const EdgeInsets.all(12),

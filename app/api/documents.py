@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.core.security import verify_api_key
@@ -147,7 +148,7 @@ async def list_documents(
         DocumentInfo(
             document_id=doc["document_id"],
             filename=doc["filename"],
-            document_type=DocumentType.TXT,  # Default, could be enhanced
+            document_type=get_document_type(doc["filename"].split(".")[-1] if "." in doc["filename"] else "txt"),
             status=ProcessingStatus.COMPLETED,
             chunks_count=doc["chunks_count"],
             created_at=datetime.now(),  # Would need to store this
@@ -180,7 +181,7 @@ async def get_document(
             return DocumentInfo(
                 document_id=doc["document_id"],
                 filename=doc["filename"],
-                document_type=DocumentType.TXT,
+                document_type=get_document_type(doc["filename"].split(".")[-1] if "." in doc["filename"] else "txt"),
                 status=ProcessingStatus.COMPLETED,
                 chunks_count=doc["chunks_count"],
                 created_at=datetime.now(),
@@ -213,3 +214,44 @@ async def delete_document(
         )
     
     return None
+
+
+@router.get(
+    "/{document_id}/content",
+    summary="Get document content",
+    description="Download or view the original document file",
+)
+async def get_document_content(
+    document_id: str,
+    _: str = Depends(verify_api_key),
+):
+    """Get the original document file."""
+    # Search for the file in the upload directory
+    upload_dir = settings.upload_path
+    
+    # Find file matching the document_id prefix
+    matching_files = list(upload_dir.glob(f"{document_id}_*"))
+    
+    if not matching_files:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document file not found: {document_id}",
+        )
+    
+    file_path = matching_files[0]
+    
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document file does not exist: {document_id}",
+        )
+    
+    # Get the original filename (remove document_id prefix)
+    original_filename = file_path.name.split('_', 1)[1] if '_' in file_path.name else file_path.name
+    
+    # Return file with appropriate media type
+    return FileResponse(
+        path=str(file_path),
+        filename=original_filename,
+        media_type="application/octet-stream",
+    )

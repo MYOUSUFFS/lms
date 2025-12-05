@@ -16,6 +16,7 @@ class DocumentProvider extends ChangeNotifier {
   DocumentProvider({required ApiService apiService}) : _apiService = apiService;
 
   // Getters
+  ApiService get apiService => _apiService;
   List<DocumentInfo> get documents => _documents;
   bool get isLoading => _isLoading;
   bool get isUploading => _isUploading;

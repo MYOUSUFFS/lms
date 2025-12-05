@@ -31,6 +31,9 @@ dependencies:
   # File Picker
   file_picker: ^8.1.2
   mime: ^2.0.0
+  
+  # PDF Viewer
+  syncfusion_flutter_pdfviewer: ^27.1.58
 
 dev_dependencies:
   flutter_test:

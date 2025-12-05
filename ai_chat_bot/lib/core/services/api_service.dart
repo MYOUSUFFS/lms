@@ -366,6 +366,30 @@ class ApiService {
     }
   }
 
+  /// Get document content URL
+  String getDocumentContentUrl(String documentId) {
+    return '$_apiBase/documents/$documentId/content';
+  }
+
+  /// Download document content
+  Future<List<int>?> getDocumentContent(String documentId) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse('$_apiBase/documents/$documentId/content'),
+            headers: {'X-API-Key': _apiKey},
+          )
+          .timeout(ApiConstants.receiveTimeout);
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   DocumentType _parseDocumentType(dynamic type) {
     if (type == null) return DocumentType.txt;
     final typeStr = type.toString().toLowerCase();
