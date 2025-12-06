@@ -357,9 +357,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
               );
             },
             tooltip: isCyberpunk ? 'NEW SESSION' : 'New Chat',
-            activeColor: isCyberpunk
-                ? AppTheme.neonPink
-                : const Color(0xFFEC4899),
+            activeColor: AppTheme.accentColor,
           ),
 
           // Toggle documents panel (medium screen)
@@ -444,12 +442,9 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     final chatProvider = context.watch<ChatProvider>();
     final isCyberpunk = AppTheme.isCyberpunk;
     final theme = Theme.of(context);
-    final accentColor = isCyberpunk
-        ? AppTheme.neonPink
-        : const Color(0xFFEC4899);
-    final primaryAccent = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final accentColor = AppTheme.accentColor;
+    final primaryAccent = AppTheme.accentColor;
+    final secondaryAccent = AppTheme.secondaryAccent;
 
     return Center(
       child: SingleChildScrollView(
@@ -463,7 +458,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [accentColor, primaryAccent],
+                  colors: [secondaryAccent, accentColor],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -791,12 +786,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
   void _showDocumentsBottomSheet(BuildContext context) {
     final isCyberpunk = AppTheme.isCyberpunk;
     final theme = Theme.of(context);
-    final accentColor = isCyberpunk
-        ? AppTheme.neonPink
-        : const Color(0xFFEC4899);
-    final primaryAccent = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final accentColor = AppTheme.accentColor;
+    final primaryAccent = AppTheme.accentColor;
 
     showModalBottomSheet(
       context: context,

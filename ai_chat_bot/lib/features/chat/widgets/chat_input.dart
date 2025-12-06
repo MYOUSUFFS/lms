@@ -15,7 +15,7 @@ class ChatInput extends StatefulWidget {
 
 // Theme-aware accent color for chat input
 Color _getAccentColor() {
-  return AppTheme.isCyberpunk ? AppTheme.neonPink : const Color(0xFF6366F1);
+  return AppTheme.accentColor;
 }
 
 class _ChatInputState extends State<ChatInput> {

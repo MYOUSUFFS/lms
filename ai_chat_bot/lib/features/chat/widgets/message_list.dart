@@ -80,10 +80,8 @@ class _MessageBubble extends StatelessWidget {
     final isUser = message.isUser;
     final isCyberpunk = AppTheme.isCyberpunk;
     final theme = Theme.of(context);
-    final userColor = isCyberpunk ? AppTheme.neonPink : const Color(0xFFEC4899);
-    final accentColor = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final userColor = AppTheme.accentColor;
+    final accentColor = AppTheme.accentColor;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -468,10 +466,8 @@ class _CyberpunkAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCyberpunk = AppTheme.isCyberpunk;
-    final userColor = isCyberpunk ? AppTheme.neonPink : const Color(0xFFEC4899);
-    final assistantColor = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final userColor = AppTheme.accentColor;
+    final assistantColor = AppTheme.accentColor;
     final color = isUser ? userColor : assistantColor;
 
     return Container(

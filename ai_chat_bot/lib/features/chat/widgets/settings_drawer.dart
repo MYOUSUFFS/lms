@@ -68,7 +68,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
       width: 380,
       backgroundColor: isCyberpunk
           ? AppTheme.backgroundDark
-          : theme.scaffoldBackgroundColor,
+          : AppTheme.themeCard,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
@@ -89,17 +89,6 @@ class _SettingsDrawerState extends State<SettingsDrawer>
 
                   const SizedBox(height: 24),
 
-                  // Appearance Section
-                  _buildSectionCard(
-                    theme,
-                    isDark,
-                    icon: Icons.palette_outlined,
-                    title: isCyberpunk ? 'DISPLAY' : 'Display',
-                    child: _buildThemeSelector(theme, settings, isDark),
-                  ),
-
-                  const SizedBox(height: 16),
-
                   // Theme Style Section
                   _buildSectionCard(
                     theme,
@@ -110,6 +99,18 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                   ),
 
                   const SizedBox(height: 16),
+
+                  // Appearance Section - only show when not cyberpunk
+                  if (!isCyberpunk) ...[
+                    _buildSectionCard(
+                      theme,
+                      isDark,
+                      icon: Icons.palette_outlined,
+                      title: 'Display',
+                      child: _buildThemeSelector(theme, settings, isDark),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Color Theme Section
                   _buildSectionCard(

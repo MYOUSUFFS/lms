@@ -8,12 +8,17 @@ class AppTheme {
   static ColorThemeOption _currentTheme = ColorThemes.defaultTheme;
   // Current theme style - can be changed at runtime
   static ThemeStyle _currentStyle = ThemeStyle.classic;
+  // Current brightness - set by the app based on theme mode
+  static Brightness _currentBrightness = Brightness.light;
 
   /// Get the current color theme
   static ColorThemeOption get currentTheme => _currentTheme;
 
   /// Get the current theme style
   static ThemeStyle get currentStyle => _currentStyle;
+
+  /// Get the current brightness
+  static Brightness get currentBrightness => _currentBrightness;
 
   /// Set the current color theme
   static void setColorTheme(ColorThemeOption theme) {
@@ -25,6 +30,11 @@ class AppTheme {
     _currentStyle = style;
   }
 
+  /// Set the current brightness
+  static void setBrightness(Brightness brightness) {
+    _currentBrightness = brightness;
+  }
+
   /// Set the current color theme by ID
   static void setColorThemeById(String themeId) {
     _currentTheme = ColorThemes.getById(themeId);
@@ -32,6 +42,9 @@ class AppTheme {
 
   /// Check if current style is cyberpunk
   static bool get isCyberpunk => _currentStyle == ThemeStyle.cyberpunk;
+
+  /// Check if current theme is dark
+  static bool get isDark => _currentBrightness == Brightness.dark;
 
   // Dynamic primary colors based on current theme
   static Color get primaryColor => _currentTheme.primaryColor;
@@ -47,8 +60,12 @@ class AppTheme {
   static const Color neonRed = Color(0xFFFF0044);
 
   // Classic theme colors
-  static const Color _classicPrimary = Color(0xFF6366F1);
-  static const Color _classicSecondary = Color(0xFF818CF8);
+  static const Color _classicSurfaceLight = Color(0xFFFAFAFA);
+  static const Color _classicBackgroundLight = Color(0xFFFAFAFA);
+  static const Color _classicCardLight = Color(0xFFFFFFFF);
+  static const Color _classicTextPrimaryLight = Color(0xFF1A1A1A);
+  static const Color _classicTextSecondaryLight = Color(0xFF6B7280);
+
   static const Color _classicSurfaceDark = Color(0xFF1E293B);
   static const Color _classicBackgroundDark = Color(0xFF0F172A);
   static const Color _classicCardDark = Color(0xFF1E293B);
@@ -79,31 +96,51 @@ class AppTheme {
   // ============ THEME-AWARE COLOR GETTERS ============
   // These return different colors based on the current theme style
 
-  /// Get accent color (neonPurple for cyberpunk, classicPrimary for classic)
-  static Color get accentColor => isCyberpunk ? neonPurple : _classicPrimary;
+  /// Get accent color (dynamic primaryColor for cyberpunk, or dynamic primaryColor for classic)
+  static Color get accentColor => isCyberpunk ? primaryColor : primaryColor;
 
-  /// Get secondary accent color (neonPink for cyberpunk, classicSecondary for classic)
-  static Color get secondaryAccent =>
-      isCyberpunk ? neonPink : _classicSecondary;
+  /// Get secondary accent color (neonPink for cyberpunk, primaryLight for classic)
+  static Color get secondaryAccent => isCyberpunk ? neonPink : primaryLight;
 
-  /// Get surface color based on theme style
-  static Color get themeSurface =>
-      isCyberpunk ? surfaceDark : _classicSurfaceDark;
+  /// Get surface color based on theme style and brightness
+  static Color get themeSurface {
+    if (isCyberpunk) {
+      return surfaceDark;
+    }
+    return isDark ? _classicSurfaceDark : _classicSurfaceLight;
+  }
 
-  /// Get background color based on theme style
-  static Color get themeBackground =>
-      isCyberpunk ? backgroundDark : _classicBackgroundDark;
+  /// Get background color based on theme style and brightness
+  static Color get themeBackground {
+    if (isCyberpunk) {
+      return backgroundDark;
+    }
+    return isDark ? _classicBackgroundDark : _classicBackgroundLight;
+  }
 
-  /// Get card color based on theme style
-  static Color get themeCard => isCyberpunk ? cardDark : _classicCardDark;
+  /// Get card color based on theme style and brightness
+  static Color get themeCard {
+    if (isCyberpunk) {
+      return cardDark;
+    }
+    return isDark ? _classicCardDark : _classicCardLight;
+  }
 
-  /// Get primary text color based on theme style
-  static Color get themeTextPrimary =>
-      isCyberpunk ? textPrimaryDark : _classicTextPrimaryDark;
+  /// Get primary text color based on theme style and brightness
+  static Color get themeTextPrimary {
+    if (isCyberpunk) {
+      return textPrimaryDark;
+    }
+    return isDark ? _classicTextPrimaryDark : _classicTextPrimaryLight;
+  }
 
-  /// Get secondary text color based on theme style
-  static Color get themeTextSecondary =>
-      isCyberpunk ? textSecondaryDark : _classicTextSecondaryDark;
+  /// Get secondary text color based on theme style and brightness
+  static Color get themeTextSecondary {
+    if (isCyberpunk) {
+      return textSecondaryDark;
+    }
+    return isDark ? _classicTextSecondaryDark : _classicTextSecondaryLight;
+  }
 
   /// Get success color based on theme style
   static Color get themeSuccess =>
@@ -207,7 +244,7 @@ class AppTheme {
 
   // Cyberpunk gradients - now dynamic based on primaryColor
   static LinearGradient get neonGradient => LinearGradient(
-    colors: [neonPink, primaryColor],
+    colors: [secondaryAccent, primaryColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -253,47 +290,69 @@ class AppTheme {
 
   // CLASSIC THEME BUILDERS
   static ThemeData _buildClassicLightTheme() {
-    const classicPrimary = Color(0xFF6366F1);
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.light(
-        primary: classicPrimary,
-        secondary: const Color(0xFF818CF8),
-        surface: const Color(0xFFF8FAFC),
-        error: const Color(0xFFEF4444),
+        primary: primaryColor,
+        secondary: primaryLight,
+        surface: const Color(0xFFFAFAFA),
+        surfaceContainer: const Color(0xFFF5F5F5),
+        surfaceContainerLow: const Color(0xFFFAFAFA),
+        surfaceContainerHigh: const Color(0xFFEFEFEF),
+        onSurface: const Color(0xFF1A1A1A),
+        onSurfaceVariant: const Color(0xFF424242),
+        outline: const Color(0xFFE0E0E0),
+        outlineVariant: const Color(0xFFF0F0F0),
+        error: const Color(0xFFD32F2F),
+        onError: Colors.white,
+        inverseSurface: const Color(0xFF121212),
+        onInverseSurface: const Color(0xFFE0E0E0),
       ),
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: const Color(0xFFFAFAFA),
       cardColor: Colors.white,
+      dividerColor: const Color(0xFFE8E8E8),
       textTheme: GoogleFonts.interTextTheme().apply(
-        bodyColor: const Color(0xFF1E293B),
-        displayColor: const Color(0xFF1E293B),
+        bodyColor: const Color(0xFF1A1A1A),
+        displayColor: const Color(0xFF1A1A1A),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1E293B),
+        foregroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
         titleTextStyle: GoogleFonts.inter(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1E293B),
+          color: const Color(0xFF1A1A1A),
         ),
+      ),
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 8,
+        shadowColor: Color(0x1A000000),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: const Color(0xFFF8F9FA),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: classicPrimary, width: 2),
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F)),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -302,27 +361,40 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: classicPrimary,
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
-          elevation: 0,
+          elevation: 2,
+          shadowColor: primaryColor.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
-      dividerTheme: DividerThemeData(color: Colors.grey.shade200, thickness: 1),
+      cardTheme: const CardThemeData(
+        color: Colors.white,
+        elevation: 2,
+        shadowColor: Color(0x0F000000),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFFE8E8E8),
+        thickness: 1,
+        space: 1,
+      ),
     );
   }
 
   static ThemeData _buildClassicDarkTheme() {
-    const classicPrimary = Color(0xFF6366F1);
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
-        primary: classicPrimary,
-        secondary: const Color(0xFF818CF8),
+        primary: primaryColor,
+        secondary: primaryLight,
         surface: const Color(0xFF1E293B),
         error: const Color(0xFFEF4444),
       ),
@@ -356,7 +428,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: classicPrimary, width: 2),
+          borderSide: BorderSide(color: primaryColor, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -365,7 +437,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: classicPrimary,
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -385,8 +457,8 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: primaryColor,
-        secondary: neonPink,
-        tertiary: neonPurple,
+        secondary: secondaryAccent,
+        tertiary: primaryLight,
         surface: surfaceDark,
         error: errorColor,
         onPrimary: backgroundDark,
@@ -448,8 +520,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: neonPink,
-          side: const BorderSide(color: neonPink, width: 2),
+          foregroundColor: secondaryAccent,
+          side: BorderSide(color: secondaryAccent, width: 2),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         ),
       ),
@@ -497,10 +569,10 @@ class AppTheme {
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: Colors.transparent,
-        foregroundColor: neonPink,
+        foregroundColor: secondaryAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: neonPink, width: 2),
+          side: BorderSide(color: secondaryAccent, width: 2),
         ),
       ),
       listTileTheme: ListTileThemeData(

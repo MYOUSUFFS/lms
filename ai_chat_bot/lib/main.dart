@@ -50,6 +50,12 @@ class AIChatBotApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
 
+    // Determine current brightness based on theme mode
+    final brightness = _getBrightness(context, settings.themeMode);
+
+    // Update AppTheme with current brightness
+    AppTheme.setBrightness(brightness);
+
     return MaterialApp(
       // Use both color theme id and style as key to force rebuild when either changes
       key: ValueKey('${settings.colorTheme.id}_${settings.themeStyle.name}'),
@@ -60,5 +66,16 @@ class AIChatBotApp extends StatelessWidget {
       themeMode: settings.themeMode,
       home: const LearningAssistantScreen(),
     );
+  }
+
+  Brightness _getBrightness(BuildContext context, ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return Brightness.light;
+      case ThemeMode.dark:
+        return Brightness.dark;
+      case ThemeMode.system:
+        return MediaQuery.of(context).platformBrightness;
+    }
   }
 }
