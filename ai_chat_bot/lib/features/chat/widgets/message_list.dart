@@ -78,6 +78,12 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
+    final userColor = isCyberpunk ? AppTheme.neonPink : const Color(0xFFEC4899);
+    final accentColor = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -87,13 +93,13 @@ class _MessageBubble extends StatelessWidget {
             : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Assistant avatar with cyberpunk glow
+          // Assistant avatar
           if (!isUser) ...[
             _CyberpunkAvatar(isUser: false),
             const SizedBox(width: 12),
           ],
 
-          // Message content with cyberpunk styling
+          // Message content
           Flexible(
             child: Container(
               constraints: BoxConstraints(
@@ -102,29 +108,43 @@ class _MessageBubble extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: isUser
-                    ? AppTheme.neonPink.withValues(alpha: 0.15)
-                    : AppTheme.cardDark,
+                    ? userColor.withValues(alpha: isCyberpunk ? 0.15 : 0.1)
+                    : (isCyberpunk ? AppTheme.cardDark : theme.cardColor),
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(4),
-                  topRight: const Radius.circular(4),
-                  bottomLeft: Radius.circular(isUser ? 4 : 0),
-                  bottomRight: Radius.circular(isUser ? 0 : 4),
-                ),
-                border: Border.all(
-                  color: isUser
-                      ? AppTheme.neonPink.withValues(alpha: 0.6)
-                      : AppTheme.primaryColor.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: isUser
-                        ? AppTheme.neonPink.withValues(alpha: 0.15)
-                        : AppTheme.primaryColor.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    spreadRadius: 0,
+                  topLeft: Radius.circular(isCyberpunk ? 4 : 16),
+                  topRight: Radius.circular(isCyberpunk ? 4 : 16),
+                  bottomLeft: Radius.circular(
+                    isUser ? (isCyberpunk ? 4 : 16) : 0,
                   ),
-                ],
+                  bottomRight: Radius.circular(
+                    isUser ? 0 : (isCyberpunk ? 4 : 16),
+                  ),
+                ),
+                border: isCyberpunk
+                    ? Border.all(
+                        color: isUser
+                            ? userColor.withValues(alpha: 0.6)
+                            : accentColor.withValues(alpha: 0.3),
+                        width: 1,
+                      )
+                    : null,
+                boxShadow: isCyberpunk
+                    ? [
+                        BoxShadow(
+                          color: isUser
+                              ? userColor.withValues(alpha: 0.15)
+                              : accentColor.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,70 +153,122 @@ class _MessageBubble extends StatelessWidget {
                   if (isUser)
                     SelectableText(
                       message.content,
-                      style: GoogleFonts.rajdhani(
-                        color: AppTheme.textPrimaryDark,
-                        fontSize: 15,
-                      ),
+                      style: isCyberpunk
+                          ? GoogleFonts.rajdhani(
+                              color: AppTheme.textPrimaryDark,
+                              fontSize: 15,
+                            )
+                          : TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                              fontSize: 15,
+                            ),
                     )
                   else
                     MarkdownBody(
                       data: message.content,
                       selectable: true,
                       styleSheet: MarkdownStyleSheet(
-                        p: GoogleFonts.rajdhani(
-                          color: AppTheme.textPrimaryDark,
-                          fontSize: 15,
-                        ),
-                        h1: GoogleFonts.orbitron(
-                          color: AppTheme.primaryColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        h2: GoogleFonts.orbitron(
-                          color: AppTheme.primaryColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        h3: GoogleFonts.orbitron(
-                          color: AppTheme.primaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        p: isCyberpunk
+                            ? GoogleFonts.rajdhani(
+                                color: AppTheme.textPrimaryDark,
+                                fontSize: 15,
+                              )
+                            : TextStyle(
+                                color: theme.textTheme.bodyLarge?.color,
+                                fontSize: 15,
+                              ),
+                        h1: isCyberpunk
+                            ? GoogleFonts.orbitron(
+                                color: accentColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                color: accentColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        h2: isCyberpunk
+                            ? GoogleFonts.orbitron(
+                                color: accentColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                color: accentColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        h3: isCyberpunk
+                            ? GoogleFonts.orbitron(
+                                color: accentColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                color: accentColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                         code: GoogleFonts.firaCode(
-                          backgroundColor: AppTheme.backgroundDark,
-                          color: AppTheme.neonGreen,
+                          backgroundColor: isCyberpunk
+                              ? AppTheme.backgroundDark
+                              : Colors.grey[100],
+                          color: isCyberpunk
+                              ? AppTheme.neonGreen
+                              : Colors.green[700],
                           fontSize: 13,
                         ),
                         codeblockDecoration: BoxDecoration(
-                          color: AppTheme.backgroundDark,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: AppTheme.neonGreen.withValues(alpha: 0.3),
+                          color: isCyberpunk
+                              ? AppTheme.backgroundDark
+                              : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(
+                            isCyberpunk ? 4 : 8,
                           ),
+                          border: isCyberpunk
+                              ? Border.all(
+                                  color: AppTheme.neonGreen.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                )
+                              : null,
                         ),
-                        blockquote: GoogleFonts.rajdhani(
-                          color: AppTheme.textSecondaryDark,
-                          fontStyle: FontStyle.italic,
-                        ),
+                        blockquote: isCyberpunk
+                            ? GoogleFonts.rajdhani(
+                                color: AppTheme.textSecondaryDark,
+                                fontStyle: FontStyle.italic,
+                              )
+                            : TextStyle(
+                                color: Colors.grey[600],
+                                fontStyle: FontStyle.italic,
+                              ),
                         blockquoteDecoration: BoxDecoration(
                           border: Border(
                             left: BorderSide(
-                              color: AppTheme.neonPurple,
+                              color: isCyberpunk
+                                  ? AppTheme.neonPurple
+                                  : accentColor,
                               width: 3,
                             ),
                           ),
                         ),
-                        listBullet: GoogleFonts.rajdhani(
-                          color: AppTheme.primaryColor,
-                        ),
-                        a: GoogleFonts.rajdhani(
-                          color: AppTheme.primaryColor,
-                          decoration: TextDecoration.underline,
-                        ),
+                        listBullet: isCyberpunk
+                            ? GoogleFonts.rajdhani(color: accentColor)
+                            : TextStyle(color: accentColor),
+                        a: isCyberpunk
+                            ? GoogleFonts.rajdhani(
+                                color: accentColor,
+                                decoration: TextDecoration.underline,
+                              )
+                            : TextStyle(
+                                color: accentColor,
+                                decoration: TextDecoration.underline,
+                              ),
                       ),
                     ),
 
-                  // Streaming indicator with cyberpunk style
+                  // Streaming indicator
                   if (isStreaming)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
@@ -206,18 +278,20 @@ class _MessageBubble extends StatelessWidget {
                           _PulsingDot(),
                           const SizedBox(width: 8),
                           Text(
-                            'PROCESSING...',
-                            style: GoogleFonts.rajdhani(
-                              fontSize: 11,
-                              color: AppTheme.primaryColor,
-                              letterSpacing: 2,
-                            ),
+                            isCyberpunk ? 'PROCESSING...' : 'Thinking...',
+                            style: isCyberpunk
+                                ? GoogleFonts.rajdhani(
+                                    fontSize: 11,
+                                    color: accentColor,
+                                    letterSpacing: 2,
+                                  )
+                                : TextStyle(fontSize: 11, color: accentColor),
                           ),
                         ],
                       ),
                     ),
 
-                  // Error message with cyberpunk style
+                  // Error message
                   if (message.hasError && message.errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -228,7 +302,9 @@ class _MessageBubble extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppTheme.errorColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            isCyberpunk ? 4 : 8,
+                          ),
                           border: Border.all(
                             color: AppTheme.errorColor.withValues(alpha: 0.5),
                           ),
@@ -243,19 +319,26 @@ class _MessageBubble extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'ERROR: ${message.errorMessage}',
-                              style: GoogleFonts.rajdhani(
-                                fontSize: 11,
-                                color: AppTheme.errorColor,
-                                letterSpacing: 1,
-                              ),
+                              isCyberpunk
+                                  ? 'ERROR: ${message.errorMessage}'
+                                  : 'Error: ${message.errorMessage}',
+                              style: isCyberpunk
+                                  ? GoogleFonts.rajdhani(
+                                      fontSize: 11,
+                                      color: AppTheme.errorColor,
+                                      letterSpacing: 1,
+                                    )
+                                  : const TextStyle(
+                                      fontSize: 11,
+                                      color: AppTheme.errorColor,
+                                    ),
                             ),
                           ],
                         ),
                       ),
                     ),
 
-                  // Sources with cyberpunk style
+                  // Sources
                   if (message.sources != null && message.sources!.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
@@ -263,41 +346,53 @@ class _MessageBubble extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'DATA SOURCES:',
-                            style: GoogleFonts.rajdhani(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.neonPurple,
-                              letterSpacing: 2,
-                            ),
+                            isCyberpunk ? 'DATA SOURCES:' : 'Sources:',
+                            style: isCyberpunk
+                                ? GoogleFonts.rajdhani(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.neonPurple,
+                                    letterSpacing: 2,
+                                  )
+                                : TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: accentColor,
+                                  ),
                           ),
                           const SizedBox(height: 6),
                           Wrap(
                             spacing: 6,
                             runSpacing: 6,
                             children: message.sources!.map((source) {
+                              final sourceColor = isCyberpunk
+                                  ? AppTheme.neonPurple
+                                  : accentColor;
                               return Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.neonPurple.withValues(
-                                    alpha: 0.1,
+                                  color: sourceColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                    isCyberpunk ? 4 : 12,
                                   ),
-                                  borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: AppTheme.neonPurple.withValues(
-                                      alpha: 0.5,
-                                    ),
+                                    color: sourceColor.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Text(
                                   source,
-                                  style: GoogleFonts.rajdhani(
-                                    fontSize: 10,
-                                    color: AppTheme.neonPurple,
-                                  ),
+                                  style: isCyberpunk
+                                      ? GoogleFonts.rajdhani(
+                                          fontSize: 10,
+                                          color: sourceColor,
+                                        )
+                                      : TextStyle(
+                                          fontSize: 10,
+                                          color: sourceColor,
+                                        ),
                                 ),
                               );
                             }).toList(),
@@ -323,19 +418,25 @@ class _MessageBubble extends StatelessWidget {
               children: [
                 _CyberpunkActionButton(
                   icon: Icons.copy_outlined,
-                  tooltip: 'COPY',
+                  tooltip: isCyberpunk ? 'COPY' : 'Copy',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: message.content));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'DATA COPIED TO BUFFER',
-                          style: GoogleFonts.rajdhani(
-                            color: AppTheme.primaryColor,
-                            letterSpacing: 1,
-                          ),
+                          isCyberpunk
+                              ? 'DATA COPIED TO BUFFER'
+                              : 'Copied to clipboard',
+                          style: isCyberpunk
+                              ? GoogleFonts.rajdhani(
+                                  color: accentColor,
+                                  letterSpacing: 1,
+                                )
+                              : TextStyle(color: theme.colorScheme.onSurface),
                         ),
-                        backgroundColor: AppTheme.cardDark,
+                        backgroundColor: isCyberpunk
+                            ? AppTheme.cardDark
+                            : theme.snackBarTheme.backgroundColor,
                         duration: const Duration(seconds: 1),
                       ),
                     );
@@ -344,7 +445,7 @@ class _MessageBubble extends StatelessWidget {
                 if (message.hasError)
                   _CyberpunkActionButton(
                     icon: Icons.refresh,
-                    tooltip: 'RETRY',
+                    tooltip: isCyberpunk ? 'RETRY' : 'Retry',
                     color: AppTheme.neonOrange,
                     onPressed: () {
                       context.read<ChatProvider>().retryLastMessage();
@@ -366,7 +467,12 @@ class _CyberpunkAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isUser ? AppTheme.neonPink : AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final userColor = isCyberpunk ? AppTheme.neonPink : const Color(0xFFEC4899);
+    final assistantColor = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
+    final color = isUser ? userColor : assistantColor;
 
     return Container(
       width: 36,
@@ -374,20 +480,30 @@ class _CyberpunkAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isUser
-              ? [AppTheme.neonPink, AppTheme.neonPurple]
-              : [AppTheme.primaryColor, AppTheme.neonPurple],
+              ? [
+                  userColor,
+                  isCyberpunk ? AppTheme.neonPurple : const Color(0xFF8B5CF6),
+                ]
+              : [
+                  assistantColor,
+                  isCyberpunk ? AppTheme.neonPurple : const Color(0xFF8B5CF6),
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.4),
-            blurRadius: 8,
-            spreadRadius: 0,
-          ),
-        ],
+        borderRadius: BorderRadius.circular(isCyberpunk ? 6 : 18),
+        border: isCyberpunk
+            ? Border.all(color: color.withValues(alpha: 0.5), width: 1)
+            : null,
+        boxShadow: isCyberpunk
+            ? [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
       ),
       child: Icon(
         isUser ? Icons.person : Icons.psychology_outlined,
@@ -413,15 +529,21 @@ class _CyberpunkActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final defaultColor = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
+    final effectiveColor = color ?? defaultColor;
     return Tooltip(
       message: tooltip,
       child: Container(
         margin: const EdgeInsets.only(bottom: 4),
         decoration: BoxDecoration(
           color: effectiveColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: effectiveColor.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 8),
+          border: isCyberpunk
+              ? Border.all(color: effectiveColor.withValues(alpha: 0.3))
+              : null,
         ),
         child: IconButton(
           icon: Icon(icon, color: effectiveColor, size: 16),
@@ -466,6 +588,9 @@ class _PulsingDotState extends State<_PulsingDot>
 
   @override
   Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final color = isCyberpunk ? AppTheme.primaryColor : const Color(0xFF6366F1);
+
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -473,17 +598,17 @@ class _PulsingDotState extends State<_PulsingDot>
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: AppTheme.primaryColor,
+            color: color,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primaryColor.withValues(
-                  alpha: 0.6 * _animation.value,
-                ),
-                blurRadius: 8 * _animation.value,
-                spreadRadius: 2 * _animation.value,
-              ),
-            ],
+            boxShadow: isCyberpunk
+                ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.6 * _animation.value),
+                      blurRadius: 8 * _animation.value,
+                      spreadRadius: 2 * _animation.value,
+                    ),
+                  ]
+                : null,
           ),
         );
       },

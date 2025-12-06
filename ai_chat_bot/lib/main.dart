@@ -51,8 +51,8 @@ class AIChatBotApp extends StatelessWidget {
     final settings = context.watch<SettingsProvider>();
 
     return MaterialApp(
-      // Use color theme id as key to force rebuild when theme changes
-      key: ValueKey(settings.colorTheme.id),
+      // Use both color theme id and style as key to force rebuild when either changes
+      key: ValueKey('${settings.colorTheme.id}_${settings.themeStyle.name}'),
       title: 'LMS AI Assistant',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

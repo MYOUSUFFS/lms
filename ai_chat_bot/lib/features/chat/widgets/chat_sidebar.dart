@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/cyberpunk_widgets.dart';
@@ -19,13 +18,18 @@ class ChatSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final chatProvider = context.watch<ChatProvider>();
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+    final secondaryAccent = AppTheme.secondaryAccent;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundDark,
+        color: isCyberpunk
+            ? AppTheme.backgroundDark
+            : Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           right: BorderSide(
-            color: AppTheme.primaryColor.withValues(alpha: 0.2),
+            color: accentColor.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -37,7 +41,7 @@ class ChatSidebar extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Cyberpunk logo and title
+                // Logo and title
                 Row(
                   children: [
                     Container(
@@ -45,16 +49,20 @@ class ChatSidebar extends StatelessWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppTheme.neonPink, AppTheme.primaryColor],
+                          colors: [secondaryAccent, accentColor],
                         ),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            spreadRadius: 1,
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(
+                          isCyberpunk ? 8 : 12,
+                        ),
+                        boxShadow: isCyberpunk
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: 0.4),
+                                  blurRadius: 12,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
                       ),
                       child: const Icon(
                         Icons.psychology_outlined,
@@ -68,18 +76,17 @@ class ChatSidebar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           NeonText(
-                            text: 'LMS CHAT',
-                            color: AppTheme.primaryColor,
+                            text: isCyberpunk ? 'LMS CHAT' : 'LMS Chat',
+                            color: accentColor,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             glowIntensity: 0.8,
                           ),
                           Text(
-                            'v2.0 NEURAL',
-                            style: GoogleFonts.rajdhani(
+                            isCyberpunk ? 'v2.0 NEURAL' : 'AI Assistant',
+                            style: AppTheme.getBodyTextStyle(
                               fontSize: 10,
-                              color: AppTheme.textSecondaryDark,
-                              letterSpacing: 2,
+                              color: AppTheme.themeTextSecondary,
                             ),
                           ),
                         ],
@@ -87,20 +94,22 @@ class ChatSidebar extends StatelessWidget {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppTheme.neonPink.withValues(alpha: 0.1),
+                        color: secondaryAccent.withValues(alpha: 0.1),
                         border: Border.all(
-                          color: AppTheme.neonPink.withValues(alpha: 0.5),
+                          color: secondaryAccent.withValues(alpha: 0.5),
                         ),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          isCyberpunk ? 4 : 12,
+                        ),
                       ),
                       child: IconButton(
                         onPressed: onOpenSettings,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.tune,
-                          color: AppTheme.neonPink,
+                          color: secondaryAccent,
                           size: 20,
                         ),
-                        tooltip: 'SETTINGS',
+                        tooltip: isCyberpunk ? 'SETTINGS' : 'Settings',
                       ),
                     ),
                   ],
@@ -108,13 +117,13 @@ class ChatSidebar extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // Cyberpunk new chat button
+                // New chat button
                 SizedBox(
                   width: double.infinity,
                   child: CyberpunkButton(
-                    text: 'NEW SESSION',
+                    text: isCyberpunk ? 'NEW SESSION' : 'New Chat',
                     icon: Icons.add,
-                    color: AppTheme.primaryColor,
+                    color: accentColor,
                     filled: true,
                     onPressed: onNewChat,
                   ),
@@ -123,8 +132,8 @@ class ChatSidebar extends StatelessWidget {
             ),
           ),
 
-          // Cyberpunk divider
-          CyberpunkDivider(color: AppTheme.primaryColor),
+          // Divider
+          CyberpunkDivider(color: accentColor),
 
           // Conversations list
           Expanded(
@@ -163,42 +172,47 @@ class ChatSidebar extends StatelessWidget {
           ),
 
           // Footer
-          const CyberpunkDivider(color: AppTheme.textSecondaryDark),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.storage_outlined,
-                  size: 14,
-                  color: AppTheme.textSecondaryDark,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${chatProvider.conversations.length} SESSIONS',
-                    style: GoogleFonts.rajdhani(
-                      fontSize: 11,
-                      color: AppTheme.textSecondaryDark,
-                      letterSpacing: 1,
+          CyberpunkDivider(color: AppTheme.themeTextSecondary),
+          Builder(
+            builder: (context) {
+              final isCyberpunk = AppTheme.isCyberpunk;
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.storage_outlined,
+                      size: 14,
+                      color: AppTheme.themeTextSecondary,
                     ),
-                  ),
-                ),
-                if (chatProvider.conversations.isNotEmpty)
-                  GestureDetector(
-                    onTap: () => _showClearAllDialog(context, chatProvider),
-                    child: Text(
-                      'PURGE ALL',
-                      style: GoogleFonts.rajdhani(
-                        fontSize: 11,
-                        color: AppTheme.errorColor,
-                        letterSpacing: 1,
-                        fontWeight: FontWeight.w600,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        isCyberpunk
+                            ? '${chatProvider.conversations.length} SESSIONS'
+                            : '${chatProvider.conversations.length} sessions',
+                        style: AppTheme.getBodyTextStyle(
+                          fontSize: 11,
+                          color: AppTheme.themeTextSecondary,
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
+                    if (chatProvider.conversations.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => _showClearAllDialog(context, chatProvider),
+                        child: Text(
+                          isCyberpunk ? 'PURGE ALL' : 'Clear All',
+                          style: AppTheme.getBodyTextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.themeError,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -206,6 +220,9 @@ class ChatSidebar extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -215,31 +232,29 @@ class ChatSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                ),
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: accentColor.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
               ),
               child: Icon(
                 Icons.chat_bubble_outline,
                 size: 40,
-                color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                color: accentColor.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 20),
             NeonText(
-              text: 'NO SESSIONS',
-              color: AppTheme.textSecondaryDark,
+              text: isCyberpunk ? 'NO SESSIONS' : 'No Chats',
+              color: AppTheme.themeTextSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               glowIntensity: 0.3,
             ),
             const SizedBox(height: 8),
             Text(
-              'Initialize new session to begin',
-              style: GoogleFonts.rajdhani(
+              'Start a new conversation',
+              style: AppTheme.getBodyTextStyle(
                 fontSize: 12,
-                color: AppTheme.textSecondaryDark.withValues(alpha: 0.7),
+                color: AppTheme.themeTextSecondary.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -269,34 +284,40 @@ class ChatSidebar extends StatelessWidget {
     ChatProvider chatProvider,
     String conversationId,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
+        backgroundColor: isCyberpunk
+            ? AppTheme.cardDark
+            : Theme.of(context).dialogBackgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
+          side: isCyberpunk
+              ? BorderSide(color: AppTheme.themeError.withValues(alpha: 0.5))
+              : BorderSide.none,
         ),
         title: NeonText(
-          text: 'TERMINATE SESSION',
-          color: AppTheme.errorColor,
+          text: isCyberpunk ? 'TERMINATE SESSION' : 'Delete Chat',
+          color: AppTheme.themeError,
           fontSize: 16,
           fontWeight: FontWeight.bold,
           glowIntensity: 0.8,
         ),
         content: Text(
-          'This action will permanently delete the session data.',
-          style: GoogleFonts.rajdhani(color: AppTheme.textSecondaryDark),
+          'This will permanently delete this conversation.',
+          style: AppTheme.getBodyTextStyle(color: AppTheme.themeTextSecondary),
         ),
         actions: [
           CyberpunkButton(
             text: 'Cancel',
-            color: AppTheme.textSecondaryDark,
+            color: AppTheme.themeTextSecondary,
             onPressed: () => Navigator.pop(context),
           ),
           CyberpunkButton(
-            text: 'Terminate',
-            color: AppTheme.errorColor,
+            text: isCyberpunk ? 'Terminate' : 'Delete',
+            color: AppTheme.themeError,
             filled: true,
             onPressed: () {
               chatProvider.deleteConversation(conversationId);
@@ -309,34 +330,40 @@ class ChatSidebar extends StatelessWidget {
   }
 
   void _showClearAllDialog(BuildContext context, ChatProvider chatProvider) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
+        backgroundColor: isCyberpunk
+            ? AppTheme.cardDark
+            : Theme.of(context).dialogBackgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
+          side: isCyberpunk
+              ? BorderSide(color: AppTheme.themeError.withValues(alpha: 0.5))
+              : BorderSide.none,
         ),
         title: NeonText(
-          text: 'PURGE ALL DATA',
-          color: AppTheme.errorColor,
+          text: isCyberpunk ? 'PURGE ALL DATA' : 'Clear All Chats',
+          color: AppTheme.themeError,
           fontSize: 16,
           fontWeight: FontWeight.bold,
           glowIntensity: 0.8,
         ),
         content: Text(
-          'WARNING: This will permanently erase all session data. This action cannot be reversed.',
-          style: GoogleFonts.rajdhani(color: AppTheme.textSecondaryDark),
+          'This will permanently delete all conversations. This action cannot be undone.',
+          style: AppTheme.getBodyTextStyle(color: AppTheme.themeTextSecondary),
         ),
         actions: [
           CyberpunkButton(
-            text: 'Abort',
-            color: AppTheme.textSecondaryDark,
+            text: isCyberpunk ? 'Abort' : 'Cancel',
+            color: AppTheme.themeTextSecondary,
             onPressed: () => Navigator.pop(context),
           ),
           CyberpunkButton(
-            text: 'Purge',
-            color: AppTheme.errorColor,
+            text: isCyberpunk ? 'Purge' : 'Clear All',
+            color: AppTheme.themeError,
             filled: true,
             onPressed: () {
               chatProvider.clearAllConversations();
@@ -377,6 +404,10 @@ class _ConversationTileState extends State<_ConversationTile> {
 
   @override
   Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+    final secondaryAccent = AppTheme.secondaryAccent;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -388,22 +419,22 @@ class _ConversationTileState extends State<_ConversationTile> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: widget.isSelected
-                ? AppTheme.primaryColor.withValues(alpha: 0.1)
+                ? accentColor.withValues(alpha: 0.1)
                 : _isHovered
-                ? AppTheme.primaryColor.withValues(alpha: 0.05)
+                ? accentColor.withValues(alpha: 0.05)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 12),
             border: Border.all(
               color: widget.isSelected
-                  ? AppTheme.primaryColor.withValues(alpha: 0.6)
+                  ? accentColor.withValues(alpha: 0.6)
                   : _isHovered
-                  ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                  ? accentColor.withValues(alpha: 0.3)
                   : Colors.transparent,
             ),
-            boxShadow: widget.isSelected
+            boxShadow: widget.isSelected && isCyberpunk
                 ? [
                     BoxShadow(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                      color: accentColor.withValues(alpha: 0.2),
                       blurRadius: 8,
                       spreadRadius: 0,
                     ),
@@ -412,21 +443,19 @@ class _ConversationTileState extends State<_ConversationTile> {
           ),
           child: Row(
             children: [
-              // Cyberpunk icon
+              // Icon
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: widget.useRag
-                      ? AppTheme.neonPurple.withValues(alpha: 0.2)
-                      : AppTheme.primaryColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
+                      ? secondaryAccent.withValues(alpha: 0.2)
+                      : accentColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 8),
                 ),
                 child: Icon(
                   widget.useRag ? Icons.memory : Icons.terminal,
                   size: 14,
-                  color: widget.useRag
-                      ? AppTheme.neonPurple
-                      : AppTheme.primaryColor,
+                  color: widget.useRag ? secondaryAccent : accentColor,
                 ),
               ),
               const SizedBox(width: 12),
@@ -437,16 +466,15 @@ class _ConversationTileState extends State<_ConversationTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.title.toUpperCase(),
-                      style: GoogleFonts.rajdhani(
+                      isCyberpunk ? widget.title.toUpperCase() : widget.title,
+                      style: AppTheme.getBodyTextStyle(
                         fontSize: 13,
                         fontWeight: widget.isSelected
                             ? FontWeight.w700
                             : FontWeight.w600,
                         color: widget.isSelected
-                            ? AppTheme.primaryColor
-                            : AppTheme.textPrimaryDark,
-                        letterSpacing: 0.5,
+                            ? accentColor
+                            : AppTheme.themeTextPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -457,9 +485,9 @@ class _ConversationTileState extends State<_ConversationTile> {
                         Expanded(
                           child: Text(
                             widget.preview,
-                            style: GoogleFonts.rajdhani(
+                            style: AppTheme.getBodyTextStyle(
                               fontSize: 11,
-                              color: AppTheme.textSecondaryDark,
+                              color: AppTheme.themeTextSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -467,10 +495,9 @@ class _ConversationTileState extends State<_ConversationTile> {
                         ),
                         Text(
                           widget.time,
-                          style: GoogleFonts.rajdhani(
+                          style: AppTheme.getBodyTextStyle(
                             fontSize: 10,
-                            color: AppTheme.textSecondaryDark,
-                            letterSpacing: 0.5,
+                            color: AppTheme.themeTextSecondary,
                           ),
                         ),
                       ],
@@ -485,7 +512,7 @@ class _ConversationTileState extends State<_ConversationTile> {
                   icon: Icon(
                     Icons.delete_outline,
                     size: 16,
-                    color: AppTheme.errorColor.withValues(alpha: 0.8),
+                    color: AppTheme.themeError.withValues(alpha: 0.8),
                   ),
                   onPressed: widget.onDelete,
                   padding: EdgeInsets.zero,

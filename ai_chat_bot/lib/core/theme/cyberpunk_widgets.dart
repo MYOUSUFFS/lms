@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_theme.dart';
 
-/// Cyberpunk styled container with neon border glow
+/// Theme-aware styled container - shows cyberpunk styling when in cyberpunk mode,
+/// clean styling in classic mode
 class CyberpunkContainer extends StatelessWidget {
   final Widget child;
   final Color? glowColor;
@@ -26,6 +27,25 @@ class CyberpunkContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveGlowColor = glowColor ?? AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+
+    if (!isCyberpunk) {
+      // Classic theme - simple clean container
+      return Container(
+        margin: margin,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
+        ),
+      );
+    }
+
+    // Cyberpunk theme
     return Container(
       margin: margin,
       decoration: BoxDecoration(
@@ -61,7 +81,8 @@ class CyberpunkContainer extends StatelessWidget {
   }
 }
 
-/// Neon glowing text widget
+/// Theme-aware text widget - neon glowing text in cyberpunk mode,
+/// regular styled text in classic mode
 class NeonText extends StatelessWidget {
   final String text;
   final Color? color;
@@ -84,7 +105,27 @@ class NeonText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final effectiveColor =
+        color ??
+        (isCyberpunk
+            ? AppTheme.primaryColor
+            : Theme.of(context).colorScheme.primary);
+
+    if (!isCyberpunk) {
+      // Classic theme - simple text without glow
+      return Text(
+        text,
+        textAlign: textAlign,
+        style: GoogleFonts.inter(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: effectiveColor,
+        ),
+      );
+    }
+
+    // Cyberpunk theme - neon glowing text
     return Text(
       text,
       textAlign: textAlign,
@@ -113,7 +154,7 @@ class NeonText extends StatelessWidget {
   }
 }
 
-/// Cyberpunk styled button with neon glow
+/// Theme-aware styled button with neon glow in cyberpunk mode
 class CyberpunkButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -141,7 +182,51 @@ class _CyberpunkButtonState extends State<CyberpunkButton> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = widget.color ?? AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final effectiveColor =
+        widget.color ??
+        (isCyberpunk
+            ? AppTheme.primaryColor
+            : Theme.of(context).colorScheme.primary);
+
+    if (!isCyberpunk) {
+      // Classic theme - Material style button
+      return widget.filled
+          ? ElevatedButton.icon(
+              onPressed: widget.isLoading ? null : widget.onPressed,
+              icon: widget.isLoading
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : (widget.icon != null
+                        ? Icon(widget.icon, size: 20)
+                        : const SizedBox.shrink()),
+              label: Text(widget.text),
+            )
+          : OutlinedButton.icon(
+              onPressed: widget.isLoading ? null : widget.onPressed,
+              icon: widget.isLoading
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: effectiveColor,
+                      ),
+                    )
+                  : (widget.icon != null
+                        ? Icon(widget.icon, size: 20)
+                        : const SizedBox.shrink()),
+              label: Text(widget.text),
+            );
+    }
+
+    // Cyberpunk theme
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -233,7 +318,7 @@ class _ScanLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Glowing icon widget
+/// Theme-aware icon widget with glow in cyberpunk mode
 class GlowingIcon extends StatelessWidget {
   final IconData icon;
   final Color? color;
@@ -250,7 +335,19 @@ class GlowingIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppTheme.primaryColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final effectiveColor =
+        color ??
+        (isCyberpunk
+            ? AppTheme.primaryColor
+            : Theme.of(context).colorScheme.primary);
+
+    if (!isCyberpunk) {
+      // Classic theme - simple icon without glow
+      return Icon(icon, color: effectiveColor, size: size);
+    }
+
+    // Cyberpunk theme - glowing icon
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -266,7 +363,7 @@ class GlowingIcon extends StatelessWidget {
   }
 }
 
-/// Cyberpunk styled divider with gradient
+/// Theme-aware divider - gradient glow in cyberpunk, simple line in classic
 class CyberpunkDivider extends StatelessWidget {
   final Color? color;
   final double height;
@@ -275,6 +372,18 @@ class CyberpunkDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
+    if (!isCyberpunk) {
+      // Classic theme - simple divider
+      return Divider(
+        height: height,
+        thickness: height,
+        color: color ?? Theme.of(context).dividerColor,
+      );
+    }
+
+    // Cyberpunk theme - gradient glowing divider
     final dividerColor = color ?? AppTheme.primaryColor;
     return Container(
       height: height,
@@ -489,18 +598,18 @@ class _CornerBracketsPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Status indicator with pulsing glow
+/// Theme-aware status indicator with pulsing glow in cyberpunk mode
 class CyberpunkStatusIndicator extends StatefulWidget {
   final bool isActive;
-  final Color activeColor;
-  final Color inactiveColor;
+  final Color? activeColor;
+  final Color? inactiveColor;
   final double size;
 
   const CyberpunkStatusIndicator({
     super.key,
     required this.isActive,
-    this.activeColor = AppTheme.successColor,
-    this.inactiveColor = AppTheme.errorColor,
+    this.activeColor,
+    this.inactiveColor,
     this.size = 8,
   });
 
@@ -535,7 +644,10 @@ class _CyberpunkStatusIndicatorState extends State<CyberpunkStatusIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isActive ? widget.activeColor : widget.inactiveColor;
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final activeColor = widget.activeColor ?? AppTheme.themeSuccess;
+    final inactiveColor = widget.inactiveColor ?? AppTheme.themeError;
+    final color = widget.isActive ? activeColor : inactiveColor;
 
     return AnimatedBuilder(
       animation: _animation,
@@ -546,7 +658,7 @@ class _CyberpunkStatusIndicatorState extends State<CyberpunkStatusIndicator>
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
-            boxShadow: widget.isActive
+            boxShadow: widget.isActive && isCyberpunk
                 ? [
                     BoxShadow(
                       color: color.withValues(alpha: 0.6 * _animation.value),

@@ -106,21 +106,32 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     final chatProvider = context.watch<ChatProvider>();
     final settingsProvider = context.watch<SettingsProvider>();
     final documentProvider = context.watch<DocumentProvider>();
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundDark,
+        color: isCyberpunk
+            ? AppTheme.backgroundDark
+            : theme.scaffoldBackgroundColor,
         border: Border(
-          left: BorderSide(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+          left: BorderSide(
+            color: isCyberpunk
+                ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                : theme.dividerColor,
+          ),
           right: BorderSide(
-            color: AppTheme.primaryColor.withValues(alpha: 0.2),
+            color: isCyberpunk
+                ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                : theme.dividerColor,
           ),
         ),
       ),
       child: Stack(
         children: [
           // Background grid pattern for cyberpunk effect
-          Positioned.fill(child: CustomPaint(painter: _GridPainter())),
+          if (isCyberpunk)
+            Positioned.fill(child: CustomPaint(painter: _GridPainter())),
           // Main content
           Column(
             children: [
@@ -177,23 +188,32 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     DocumentProvider documentProvider,
   ) {
     final settingsProvider = context.watch<SettingsProvider>();
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
+    final accentColor = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: isCyberpunk ? AppTheme.cardDark : theme.cardColor,
         border: Border(
           bottom: BorderSide(
-            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            color: isCyberpunk
+                ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                : theme.dividerColor,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isCyberpunk
+            ? [
+                BoxShadow(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: Row(
         children: [
@@ -221,19 +241,26 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
           const SizedBox(width: 8),
 
-          // Title with cyberpunk styling
+          // Title
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  chatProvider.currentConversation?.title ?? 'NEURAL LINK',
-                  style: GoogleFonts.orbitron(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primaryColor,
-                    letterSpacing: 1,
-                  ),
+                  chatProvider.currentConversation?.title ??
+                      (isCyberpunk ? 'NEURAL LINK' : 'AI Assistant'),
+                  style: isCyberpunk
+                      ? GoogleFonts.orbitron(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: accentColor,
+                          letterSpacing: 1,
+                        )
+                      : TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.textTheme.titleLarge?.color,
+                        ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
@@ -241,20 +268,30 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                   children: [
                     if (documentProvider.hasDocuments) ...[
                       Text(
-                        '${documentProvider.documentCount} DOCS',
-                        style: GoogleFonts.rajdhani(
-                          fontSize: 11,
-                          color: AppTheme.successColor,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
-                        ),
+                        isCyberpunk
+                            ? '${documentProvider.documentCount} DOCS'
+                            : '${documentProvider.documentCount} docs',
+                        style: isCyberpunk
+                            ? GoogleFonts.rajdhani(
+                                fontSize: 11,
+                                color: AppTheme.successColor,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                              )
+                            : TextStyle(
+                                fontSize: 12,
+                                color: Colors.green[600],
+                                fontWeight: FontWeight.w500,
+                              ),
                       ),
                       const SizedBox(width: 8),
                       Container(
                         width: 4,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: AppTheme.textSecondaryDark,
+                          color: isCyberpunk
+                              ? AppTheme.textSecondaryDark
+                              : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -266,15 +303,25 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      chatProvider.isConnected ? 'ONLINE' : 'OFFLINE',
-                      style: GoogleFonts.rajdhani(
-                        color: chatProvider.isConnected
-                            ? AppTheme.successColor
-                            : AppTheme.errorColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1,
-                      ),
+                      chatProvider.isConnected
+                          ? (isCyberpunk ? 'ONLINE' : 'Online')
+                          : (isCyberpunk ? 'OFFLINE' : 'Offline'),
+                      style: isCyberpunk
+                          ? GoogleFonts.rajdhani(
+                              color: chatProvider.isConnected
+                                  ? AppTheme.successColor
+                                  : AppTheme.errorColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            )
+                          : TextStyle(
+                              color: chatProvider.isConnected
+                                  ? Colors.green[600]
+                                  : Colors.red[600],
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
                     ),
                   ],
                 ),
@@ -282,17 +329,23 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
             ),
           ),
 
-          // RAG toggle with cyberpunk style
+          // RAG toggle
           _buildCyberpunkIconButton(
             icon: settingsProvider.useRag
                 ? Icons.memory
                 : Icons.chat_bubble_outline,
             onPressed: () => settingsProvider.toggleRag(),
             tooltip: settingsProvider.useRag
-                ? 'RAG ENABLED - USING DOCUMENTS'
-                : 'RAG DISABLED - CLICK TO ENABLE',
+                ? (isCyberpunk
+                      ? 'RAG ENABLED - USING DOCUMENTS'
+                      : 'RAG Enabled - Using Documents')
+                : (isCyberpunk
+                      ? 'RAG DISABLED - CLICK TO ENABLE'
+                      : 'RAG Disabled - Click to Enable'),
             isActive: settingsProvider.useRag,
-            activeColor: AppTheme.neonPurple,
+            activeColor: isCyberpunk
+                ? AppTheme.neonPurple
+                : const Color(0xFF8B5CF6),
           ),
 
           // New chat button
@@ -303,8 +356,10 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                 useRag: settingsProvider.useRag,
               );
             },
-            tooltip: 'NEW SESSION',
-            activeColor: AppTheme.neonPink,
+            tooltip: isCyberpunk ? 'NEW SESSION' : 'New Chat',
+            activeColor: isCyberpunk
+                ? AppTheme.neonPink
+                : const Color(0xFFEC4899),
           ),
 
           // Toggle documents panel (medium screen)
@@ -348,9 +403,13 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     bool isActive = false,
     Color? activeColor,
   }) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final defaultColor = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
     final color = isActive
-        ? (activeColor ?? AppTheme.primaryColor)
-        : AppTheme.textSecondaryDark;
+        ? (activeColor ?? defaultColor)
+        : (isCyberpunk ? AppTheme.textSecondaryDark : Colors.grey[600]!);
 
     return Tooltip(
       message: tooltip,
@@ -358,10 +417,14 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
           color: isActive ? color.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border.all(
-            color: isActive ? color.withValues(alpha: 0.5) : Colors.transparent,
-          ),
-          borderRadius: BorderRadius.circular(4),
+          border: isCyberpunk
+              ? Border.all(
+                  color: isActive
+                      ? color.withValues(alpha: 0.5)
+                      : Colors.transparent,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 8),
         ),
         child: IconButton(
           icon: Icon(icon, color: color, size: 20),
@@ -379,6 +442,14 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
   ) {
     final settingsProvider = context.watch<SettingsProvider>();
     final chatProvider = context.watch<ChatProvider>();
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
+    final accentColor = isCyberpunk
+        ? AppTheme.neonPink
+        : const Color(0xFFEC4899);
+    final primaryAccent = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
 
     return Center(
       child: SingleChildScrollView(
@@ -386,33 +457,43 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Cyberpunk Logo with glow
+            // Logo with glow
             Container(
               width: 100,
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppTheme.neonPink, AppTheme.primaryColor],
+                  colors: [accentColor, primaryAccent],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.5),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                  BoxShadow(
-                    color: AppTheme.neonPink.withValues(alpha: 0.3),
-                    blurRadius: 30,
-                    spreadRadius: 4,
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(isCyberpunk ? 16 : 24),
+                border: isCyberpunk
+                    ? Border.all(
+                        color: primaryAccent.withValues(alpha: 0.5),
+                        width: 2,
+                      )
+                    : null,
+                boxShadow: isCyberpunk
+                    ? [
+                        BoxShadow(
+                          color: primaryAccent.withValues(alpha: 0.4),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                        BoxShadow(
+                          color: accentColor.withValues(alpha: 0.3),
+                          blurRadius: 30,
+                          spreadRadius: 4,
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: primaryAccent.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
               ),
               child: const Icon(
                 Icons.psychology_outlined,
@@ -423,24 +504,41 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
             const SizedBox(height: 32),
 
-            // Glowing title
-            NeonText(
-              text: 'NEURAL LINK',
-              color: AppTheme.primaryColor,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              glowIntensity: 1.2,
-            ),
+            // Title
+            isCyberpunk
+                ? NeonText(
+                    text: 'NEURAL LINK',
+                    color: primaryAccent,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    glowIntensity: 1.2,
+                  )
+                : Text(
+                    'AI Assistant',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
+                  ),
 
             const SizedBox(height: 8),
 
             Text(
-              'AI-POWERED LEARNING INTERFACE',
-              style: GoogleFonts.rajdhani(
-                fontSize: 14,
-                color: AppTheme.textSecondaryDark,
-                letterSpacing: 4,
-              ),
+              isCyberpunk
+                  ? 'AI-POWERED LEARNING INTERFACE'
+                  : 'Your intelligent learning companion',
+              style: isCyberpunk
+                  ? GoogleFonts.rajdhani(
+                      fontSize: 14,
+                      color: AppTheme.textSecondaryDark,
+                      letterSpacing: 4,
+                    )
+                  : TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      letterSpacing: 1,
+                    ),
             ),
 
             const SizedBox(height: 48),
@@ -449,8 +547,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
             if (!provider.hasDocuments) ...[
               // Upload prompt when no documents
               CyberpunkContainer(
-                glowColor: AppTheme.neonPink,
-                glowIntensity: 0.7,
+                glowColor: accentColor,
+                glowIntensity: isCyberpunk ? 0.7 : 0,
                 padding: const EdgeInsets.all(28),
                 child: Column(
                   children: [
@@ -458,37 +556,52 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppTheme.neonPink.withValues(alpha: 0.5),
+                          color: accentColor.withValues(alpha: 0.5),
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                          isCyberpunk ? 8 : 12,
+                        ),
                       ),
                       child: Icon(
                         Icons.cloud_upload_outlined,
                         size: 48,
-                        color: AppTheme.neonPink.withValues(alpha: 0.9),
+                        color: accentColor.withValues(alpha: 0.9),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    NeonText(
-                      text: 'UPLOAD DATA',
-                      color: AppTheme.neonPink,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    isCyberpunk
+                        ? NeonText(
+                            text: 'UPLOAD DATA',
+                            color: accentColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          )
+                        : Text(
+                            'Upload Documents',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: accentColor,
+                            ),
+                          ),
                     const SizedBox(height: 12),
                     Text(
-                      'Initialize neural network with your documents\nPDF • TXT • HTML • CSV • IMAGES • URLs',
-                      style: GoogleFonts.rajdhani(
-                        color: AppTheme.textSecondaryDark,
-                        fontSize: 13,
-                      ),
+                      isCyberpunk
+                          ? 'Initialize neural network with your documents\nPDF • TXT • HTML • CSV • IMAGES • URLs'
+                          : 'Add your documents to get started\nPDF • TXT • HTML • CSV • Images • URLs',
+                      style: isCyberpunk
+                          ? GoogleFonts.rajdhani(
+                              color: AppTheme.textSecondaryDark,
+                              fontSize: 13,
+                            )
+                          : TextStyle(color: Colors.grey[600], fontSize: 13),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
                     CyberpunkButton(
                       text: 'Add Document',
                       icon: Icons.add,
-                      color: AppTheme.neonPink,
+                      color: accentColor,
                       filled: true,
                       onPressed: () => AddDocumentDialog.show(
                         context,
@@ -501,27 +614,33 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
               const SizedBox(height: 32),
 
-              // Cyberpunk divider
-              const SizedBox(
+              // Divider
+              SizedBox(
                 width: 200,
-                child: CyberpunkDivider(color: AppTheme.textSecondaryDark),
+                child: isCyberpunk
+                    ? const CyberpunkDivider(color: AppTheme.textSecondaryDark)
+                    : Divider(color: Colors.grey[300]),
               ),
 
               const SizedBox(height: 16),
 
               Text(
-                'OR INITIATE DIRECT LINK',
-                style: GoogleFonts.rajdhani(
-                  color: AppTheme.textSecondaryDark.withValues(alpha: 0.6),
-                  fontSize: 12,
-                  letterSpacing: 2,
-                ),
+                isCyberpunk ? 'OR INITIATE DIRECT LINK' : 'or start chatting',
+                style: isCyberpunk
+                    ? GoogleFonts.rajdhani(
+                        color: AppTheme.textSecondaryDark.withValues(
+                          alpha: 0.6,
+                        ),
+                        fontSize: 12,
+                        letterSpacing: 2,
+                      )
+                    : TextStyle(color: Colors.grey[500], fontSize: 12),
               ),
             ] else ...[
               // Status when documents exist
               CyberpunkContainer(
                 glowColor: AppTheme.successColor,
-                glowIntensity: 0.5,
+                glowIntensity: isCyberpunk ? 0.5 : 0,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -529,31 +648,41 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                     const CyberpunkStatusIndicator(isActive: true),
                     const SizedBox(width: 12),
                     Text(
-                      '${provider.documentCount} DOCUMENTS LOADED',
-                      style: GoogleFonts.rajdhani(
-                        color: AppTheme.successColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2,
-                      ),
+                      isCyberpunk
+                          ? '${provider.documentCount} DOCUMENTS LOADED'
+                          : '${provider.documentCount} documents loaded',
+                      style: isCyberpunk
+                          ? GoogleFonts.rajdhani(
+                              color: AppTheme.successColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 2,
+                            )
+                          : TextStyle(
+                              color: Colors.green[600],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                'NEURAL NETWORK READY',
-                style: GoogleFonts.rajdhani(
-                  color: AppTheme.textSecondaryDark,
-                  fontSize: 12,
-                  letterSpacing: 3,
-                ),
+                isCyberpunk ? 'NEURAL NETWORK READY' : 'Ready to assist',
+                style: isCyberpunk
+                    ? GoogleFonts.rajdhani(
+                        color: AppTheme.textSecondaryDark,
+                        fontSize: 12,
+                        letterSpacing: 3,
+                      )
+                    : TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
             ],
 
             const SizedBox(height: 32),
 
-            // Quick prompts with cyberpunk styling
+            // Quick prompts
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -561,33 +690,39 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
               children: [
                 _buildCyberpunkPrompt(
                   context,
-                  provider.hasDocuments ? 'ANALYZE DATA' : 'INITIALIZE',
+                  provider.hasDocuments
+                      ? (isCyberpunk ? 'ANALYZE DATA' : 'Analyze Data')
+                      : (isCyberpunk ? 'INITIALIZE' : 'Get Started'),
                   provider.hasDocuments
                       ? Icons.analytics_outlined
                       : Icons.power_settings_new,
                   chatProvider,
                   settingsProvider,
-                  AppTheme.primaryColor,
+                  primaryAccent,
                 ),
                 _buildCyberpunkPrompt(
                   context,
-                  provider.hasDocuments ? 'EXTRACT INFO' : 'CAPABILITIES',
+                  provider.hasDocuments
+                      ? (isCyberpunk ? 'EXTRACT INFO' : 'Extract Info')
+                      : (isCyberpunk ? 'CAPABILITIES' : 'Capabilities'),
                   provider.hasDocuments
                       ? Icons.lightbulb_outline
                       : Icons.help_outline,
                   chatProvider,
                   settingsProvider,
-                  AppTheme.neonPurple,
+                  isCyberpunk ? AppTheme.neonPurple : const Color(0xFF8B5CF6),
                 ),
                 _buildCyberpunkPrompt(
                   context,
-                  provider.hasDocuments ? 'GENERATE NOTES' : 'BEGIN LEARNING',
+                  provider.hasDocuments
+                      ? (isCyberpunk ? 'GENERATE NOTES' : 'Generate Notes')
+                      : (isCyberpunk ? 'BEGIN LEARNING' : 'Start Learning'),
                   provider.hasDocuments
                       ? Icons.edit_note
                       : Icons.school_outlined,
                   chatProvider,
                   settingsProvider,
-                  AppTheme.neonPink,
+                  accentColor,
                 ),
               ],
             ),
@@ -605,6 +740,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     SettingsProvider settingsProvider,
     Color color,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -622,7 +759,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
             border: Border.all(color: color.withValues(alpha: 0.5)),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 20),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -631,12 +768,18 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
               const SizedBox(width: 8),
               Text(
                 prompt,
-                style: GoogleFonts.rajdhani(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                ),
+                style: isCyberpunk
+                    ? GoogleFonts.rajdhani(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      )
+                    : TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
               ),
             ],
           ),
@@ -646,6 +789,15 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
   }
 
   void _showDocumentsBottomSheet(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
+    final accentColor = isCyberpunk
+        ? AppTheme.neonPink
+        : const Color(0xFFEC4899);
+    final primaryAccent = isCyberpunk
+        ? AppTheme.primaryColor
+        : const Color(0xFF6366F1);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -656,37 +808,48 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
           decoration: BoxDecoration(
-            color: AppTheme.cardDark,
+            color: isCyberpunk ? AppTheme.cardDark : theme.cardColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            border: Border.all(
-              color: AppTheme.primaryColor.withValues(alpha: 0.3),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primaryColor.withValues(alpha: 0.2),
-                blurRadius: 16,
-                spreadRadius: 2,
-              ),
-            ],
+            border: isCyberpunk
+                ? Border.all(color: primaryAccent.withValues(alpha: 0.3))
+                : null,
+            boxShadow: isCyberpunk
+                ? [
+                    BoxShadow(
+                      color: primaryAccent.withValues(alpha: 0.2),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ],
           ),
           child: Column(
             children: [
-              // Handle bar with cyberpunk styling
+              // Handle bar
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppTheme.neonPink, AppTheme.primaryColor],
-                  ),
+                  gradient: isCyberpunk
+                      ? LinearGradient(colors: [accentColor, primaryAccent])
+                      : null,
+                  color: isCyberpunk ? null : Colors.grey[300],
                   borderRadius: BorderRadius.circular(2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.5),
-                      blurRadius: 8,
-                    ),
-                  ],
+                  boxShadow: isCyberpunk
+                      ? [
+                          BoxShadow(
+                            color: primaryAccent.withValues(alpha: 0.5),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
                 ),
               ),
               // Documents panel

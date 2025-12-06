@@ -13,6 +13,11 @@ class ChatInput extends StatefulWidget {
   State<ChatInput> createState() => _ChatInputState();
 }
 
+// Theme-aware accent color for chat input
+Color _getAccentColor() {
+  return AppTheme.isCyberpunk ? AppTheme.neonPink : const Color(0xFF6366F1);
+}
+
 class _ChatInputState extends State<ChatInput> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -53,29 +58,37 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = _getAccentColor();
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: isCyberpunk ? AppTheme.cardDark : theme.cardColor,
         border: Border(
           top: BorderSide(
-            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            color: isCyberpunk
+                ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                : theme.dividerColor,
             width: 1,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        boxShadow: isCyberpunk
+            ? [
+                BoxShadow(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : null,
       ),
       child: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Text input with cyberpunk styling
+            // Text input
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -95,15 +108,26 @@ class _ChatInputState extends State<ChatInput> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: AppTheme.backgroundDark,
-                          borderRadius: BorderRadius.circular(4),
+                          color: isCyberpunk
+                              ? AppTheme.backgroundDark
+                              : theme.inputDecorationTheme.fillColor ??
+                                    Colors.grey[100],
+                          borderRadius: BorderRadius.circular(
+                            isCyberpunk ? 4 : 12,
+                          ),
                           border: Border.all(
                             color: _focusNode.hasFocus
-                                ? AppTheme.primaryColor
-                                : AppTheme.primaryColor.withValues(alpha: 0.3),
+                                ? (isCyberpunk
+                                      ? AppTheme.primaryColor
+                                      : accentColor)
+                                : (isCyberpunk
+                                      ? AppTheme.primaryColor.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : Colors.grey[300]!),
                             width: _focusNode.hasFocus ? 2 : 1,
                           ),
-                          boxShadow: _focusNode.hasFocus
+                          boxShadow: _focusNode.hasFocus && isCyberpunk
                               ? [
                                   BoxShadow(
                                     color: AppTheme.primaryColor.withValues(
@@ -122,19 +146,29 @@ class _ChatInputState extends State<ChatInput> {
                           minLines: 1,
                           textInputAction: TextInputAction.newline,
                           keyboardType: TextInputType.multiline,
-                          style: GoogleFonts.rajdhani(
-                            color: AppTheme.textPrimaryDark,
-                            fontSize: 15,
-                          ),
-                          cursorColor: AppTheme.primaryColor,
+                          style: isCyberpunk
+                              ? GoogleFonts.rajdhani(
+                                  color: AppTheme.textPrimaryDark,
+                                  fontSize: 15,
+                                )
+                              : TextStyle(
+                                  color: theme.textTheme.bodyLarge?.color,
+                                  fontSize: 15,
+                                ),
+                          cursorColor: isCyberpunk
+                              ? AppTheme.primaryColor
+                              : accentColor,
                           decoration: InputDecoration(
-                            hintText: 'ENTER QUERY...',
-                            hintStyle: GoogleFonts.rajdhani(
-                              color: AppTheme.textSecondaryDark.withValues(
-                                alpha: 0.5,
-                              ),
-                              letterSpacing: 1,
-                            ),
+                            hintText: isCyberpunk
+                                ? 'ENTER QUERY...'
+                                : 'Type your message...',
+                            hintStyle: isCyberpunk
+                                ? GoogleFonts.rajdhani(
+                                    color: AppTheme.textSecondaryDark
+                                        .withValues(alpha: 0.5),
+                                    letterSpacing: 1,
+                                  )
+                                : TextStyle(color: Colors.grey[500]),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -153,26 +187,28 @@ class _ChatInputState extends State<ChatInput> {
 
             const SizedBox(width: 12),
 
-            // Cyberpunk send button
+            // Send button
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 48,
               height: 48,
               decoration: BoxDecoration(
                 color: _hasText && !widget.isLoading
-                    ? AppTheme.neonPink.withValues(alpha: 0.2)
-                    : AppTheme.surfaceDark,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: _hasText && !widget.isLoading
-                      ? AppTheme.neonPink
-                      : AppTheme.textSecondaryDark.withValues(alpha: 0.3),
-                  width: 2,
-                ),
-                boxShadow: _hasText && !widget.isLoading
+                    ? accentColor.withValues(alpha: isCyberpunk ? 0.2 : 1.0)
+                    : (isCyberpunk ? AppTheme.surfaceDark : Colors.grey[200]),
+                borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 24),
+                border: isCyberpunk
+                    ? Border.all(
+                        color: _hasText && !widget.isLoading
+                            ? accentColor
+                            : AppTheme.textSecondaryDark.withValues(alpha: 0.3),
+                        width: 2,
+                      )
+                    : null,
+                boxShadow: _hasText && !widget.isLoading && isCyberpunk
                     ? [
                         BoxShadow(
-                          color: AppTheme.neonPink.withValues(alpha: 0.4),
+                          color: accentColor.withValues(alpha: 0.4),
                           blurRadius: 12,
                           spreadRadius: 0,
                         ),
@@ -183,7 +219,7 @@ class _ChatInputState extends State<ChatInput> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _hasText && !widget.isLoading ? _handleSend : null,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 24),
                   child: Center(
                     child: widget.isLoading
                         ? SizedBox(
@@ -191,16 +227,18 @@ class _ChatInputState extends State<ChatInput> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppTheme.neonPink,
+                              color: isCyberpunk ? accentColor : Colors.white,
                             ),
                           )
                         : Icon(
                             Icons.send_rounded,
                             color: _hasText
-                                ? AppTheme.neonPink
-                                : AppTheme.textSecondaryDark.withValues(
-                                    alpha: 0.5,
-                                  ),
+                                ? (isCyberpunk ? accentColor : Colors.white)
+                                : (isCyberpunk
+                                      ? AppTheme.textSecondaryDark.withValues(
+                                          alpha: 0.5,
+                                        )
+                                      : Colors.grey[500]),
                             size: 20,
                           ),
                   ),

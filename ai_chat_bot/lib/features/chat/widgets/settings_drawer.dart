@@ -6,6 +6,7 @@ import '../../../core/providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/cyberpunk_widgets.dart';
 import '../../../core/models/color_theme.dart';
+import '../../../core/models/theme_style.dart';
 
 class SettingsDrawer extends StatefulWidget {
   const SettingsDrawer({super.key});
@@ -61,15 +62,18 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     final settings = context.watch<SettingsProvider>();
     final chatProvider = context.watch<ChatProvider>();
     final isDark = theme.brightness == Brightness.dark;
+    final isCyberpunk = AppTheme.isCyberpunk;
 
     return Drawer(
       width: 380,
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: isCyberpunk
+          ? AppTheme.backgroundDark
+          : theme.scaffoldBackgroundColor,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
-            // Cyberpunk Header
+            // Header
             _buildCyberpunkHeader(context, settings),
 
             // Content
@@ -90,8 +94,19 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                     theme,
                     isDark,
                     icon: Icons.palette_outlined,
-                    title: 'DISPLAY',
+                    title: isCyberpunk ? 'DISPLAY' : 'Display',
                     child: _buildThemeSelector(theme, settings, isDark),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Theme Style Section
+                  _buildSectionCard(
+                    theme,
+                    isDark,
+                    icon: Icons.style_outlined,
+                    title: isCyberpunk ? 'THEME STYLE' : 'Theme Style',
+                    child: _buildThemeStyleSelector(theme, settings, isDark),
                   ),
 
                   const SizedBox(height: 16),
@@ -101,7 +116,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                     theme,
                     isDark,
                     icon: Icons.color_lens_outlined,
-                    title: 'ACCENT COLOR',
+                    title: isCyberpunk ? 'ACCENT COLOR' : 'Accent Color',
                     child: _buildColorThemeSelector(theme, settings, isDark),
                   ),
 
@@ -112,7 +127,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                     theme,
                     isDark,
                     icon: Icons.api_outlined,
-                    title: 'API CONFIG',
+                    title: isCyberpunk ? 'API CONFIG' : 'API Configuration',
                     child: Column(
                       children: [
                         _buildTextField(
@@ -142,7 +157,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
                               size: 20,
-                              color: AppTheme.primaryColor,
+                              color: AppTheme.accentColor,
                             ),
                             onPressed: () {
                               setState(() => _showApiKey = !_showApiKey);
@@ -166,7 +181,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                     theme,
                     isDark,
                     icon: Icons.chat_bubble_outline,
-                    title: 'NEURAL SETTINGS',
+                    title: isCyberpunk ? 'NEURAL SETTINGS' : 'Chat Settings',
                     child: Column(
                       children: [
                         _buildSwitchTile(
@@ -178,10 +193,10 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                           value: settings.useStreaming,
                           onChanged: settings.setUseStreaming,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           child: CyberpunkDivider(
-                            color: AppTheme.textSecondaryDark,
+                            color: AppTheme.themeTextSecondary,
                           ),
                         ),
                         _buildSwitchTile(
@@ -216,6 +231,8 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     BuildContext context,
     SettingsProvider settings,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 16, 24),
       decoration: BoxDecoration(
@@ -227,17 +244,21 @@ class _SettingsDrawerState extends State<SettingsDrawer>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(isCyberpunk ? 16 : 24),
+          bottomRight: Radius.circular(isCyberpunk ? 16 : 24),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: settings.colorTheme.primaryColor.withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: isCyberpunk
+            ? [
+                BoxShadow(
+                  color: settings.colorTheme.primaryColor.withValues(
+                    alpha: 0.4,
+                  ),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
       ),
       child: SafeArea(
         bottom: false,
@@ -250,7 +271,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 12),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.3),
                     ),
@@ -269,7 +290,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.3),
                     ),
@@ -282,13 +303,19 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'SETTINGS',
-                        style: GoogleFonts.orbitron(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                        ),
+                        isCyberpunk ? 'SETTINGS' : 'Settings',
+                        style: isCyberpunk
+                            ? GoogleFonts.orbitron(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              )
+                            : GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                       ),
                       const SizedBox(height: 4),
                       Container(
@@ -298,19 +325,29 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            isCyberpunk ? 4 : 8,
+                          ),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
-                          'SYSTEM CONFIG',
-                          style: GoogleFonts.rajdhani(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2,
-                          ),
+                          isCyberpunk
+                              ? 'SYSTEM CONFIG'
+                              : 'System Configuration',
+                          style: isCyberpunk
+                              ? GoogleFonts.rajdhani(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 2,
+                                )
+                              : GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
                         ),
                       ),
                     ],
@@ -330,9 +367,10 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     bool isDark,
   ) {
     final isConnected = chatProvider.isConnected;
+    final isCyberpunk = AppTheme.isCyberpunk;
     final statusColor = isConnected
-        ? AppTheme.successColor
-        : AppTheme.errorColor;
+        ? AppTheme.themeSuccess
+        : AppTheme.themeError;
 
     return CyberpunkContainer(
       glowColor: statusColor,
@@ -347,22 +385,27 @@ class _SettingsDrawerState extends State<SettingsDrawer>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isConnected ? 'LINK ESTABLISHED' : 'LINK OFFLINE',
-                  style: GoogleFonts.orbitron(
+                  isConnected
+                      ? (isCyberpunk ? 'LINK ESTABLISHED' : 'Connected')
+                      : (isCyberpunk ? 'LINK OFFLINE' : 'Disconnected'),
+                  style: AppTheme.getHeaderTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: statusColor,
-                    letterSpacing: 1,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   isConnected
-                      ? 'Neural network connected'
-                      : 'Check server configuration',
-                  style: GoogleFonts.rajdhani(
+                      ? (isCyberpunk
+                            ? 'Neural network connected'
+                            : 'Server is reachable')
+                      : (isCyberpunk
+                            ? 'Check server configuration'
+                            : 'Check your settings'),
+                  style: AppTheme.getBodyTextStyle(
                     fontSize: 12,
-                    color: AppTheme.textSecondaryDark,
+                    color: AppTheme.themeTextSecondary,
                   ),
                 ),
               ],
@@ -385,8 +428,10 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     required String title,
     required Widget child,
   }) {
+    final accentColor = AppTheme.accentColor;
+
     return CyberpunkContainer(
-      glowColor: AppTheme.primaryColor,
+      glowColor: accentColor,
       glowIntensity: 0.3,
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -394,11 +439,11 @@ class _SettingsDrawerState extends State<SettingsDrawer>
         children: [
           Row(
             children: [
-              Icon(icon, color: AppTheme.primaryColor, size: 18),
+              Icon(icon, color: accentColor, size: 18),
               const SizedBox(width: 10),
               NeonText(
                 text: title,
-                color: AppTheme.primaryColor,
+                color: accentColor,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 glowIntensity: 0.5,
@@ -417,36 +462,38 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     SettingsProvider settings,
     bool isDark,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     return Row(
       children: [
         _buildThemeOption(
           theme,
           isDark,
           icon: Icons.brightness_5_rounded,
-          label: 'LIGHT',
+          label: isCyberpunk ? 'LIGHT' : 'Light',
           isSelected: settings.themeMode == ThemeMode.light,
           onTap: () => settings.setThemeMode(ThemeMode.light),
-          color: AppTheme.neonYellow,
+          color: isCyberpunk ? AppTheme.neonYellow : const Color(0xFFF59E0B),
         ),
         const SizedBox(width: 12),
         _buildThemeOption(
           theme,
           isDark,
           icon: Icons.brightness_2_rounded,
-          label: 'DARK',
+          label: isCyberpunk ? 'DARK' : 'Dark',
           isSelected: settings.themeMode == ThemeMode.dark,
           onTap: () => settings.setThemeMode(ThemeMode.dark),
-          color: AppTheme.neonPurple,
+          color: isCyberpunk ? AppTheme.neonPurple : const Color(0xFF8B5CF6),
         ),
         const SizedBox(width: 12),
         _buildThemeOption(
           theme,
           isDark,
           icon: Icons.brightness_auto_rounded,
-          label: 'AUTO',
+          label: isCyberpunk ? 'AUTO' : 'Auto',
           isSelected: settings.themeMode == ThemeMode.system,
           onTap: () => settings.setThemeMode(ThemeMode.system),
-          color: AppTheme.primaryColor,
+          color: AppTheme.accentColor,
         ),
       ],
     );
@@ -457,6 +504,8 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     SettingsProvider settings,
     bool isDark,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -465,7 +514,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: settings.colorTheme.primaryColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 8),
             border: Border.all(
               color: settings.colorTheme.primaryColor.withValues(alpha: 0.5),
             ),
@@ -478,24 +527,27 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                 decoration: BoxDecoration(
                   color: settings.colorTheme.primaryColor,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: settings.colorTheme.primaryColor.withValues(
-                        alpha: 0.5,
-                      ),
-                      blurRadius: 8,
-                    ),
-                  ],
+                  boxShadow: isCyberpunk
+                      ? [
+                          BoxShadow(
+                            color: settings.colorTheme.primaryColor.withValues(
+                              alpha: 0.5,
+                            ),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
                 ),
               ),
               const SizedBox(width: 10),
               Text(
-                settings.colorTheme.name.toUpperCase(),
-                style: GoogleFonts.rajdhani(
+                isCyberpunk
+                    ? settings.colorTheme.name.toUpperCase()
+                    : settings.colorTheme.name,
+                style: AppTheme.getBodyTextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: settings.colorTheme.primaryColor,
-                  letterSpacing: 1,
                 ),
               ),
             ],
@@ -533,14 +585,16 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                               spreadRadius: 2,
                             ),
                           ]
-                        : [
+                        : isCyberpunk
+                        ? [
                             BoxShadow(
                               color: colorTheme.primaryColor.withValues(
                                 alpha: 0.3,
                               ),
                               blurRadius: 4,
                             ),
-                          ],
+                          ]
+                        : null,
                   ),
                   child: isSelected
                       ? const Icon(Icons.check, color: Colors.white, size: 18)
@@ -554,6 +608,117 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     );
   }
 
+  Widget _buildThemeStyleSelector(
+    ThemeData theme,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildThemeStyleOption(
+              theme,
+              isDark,
+              icon: Icons.star_outline,
+              label: 'Classic',
+              description: 'Clean & Modern',
+              isSelected: settings.themeStyle == ThemeStyle.classic,
+              onTap: () => settings.setThemeStyle(ThemeStyle.classic),
+              color: const Color(0xFF6366F1),
+            ),
+            const SizedBox(width: 12),
+            _buildThemeStyleOption(
+              theme,
+              isDark,
+              icon: Icons.flash_on_outlined,
+              label: 'Cyberpunk',
+              description: 'Neon & Futuristic',
+              isSelected: settings.themeStyle == ThemeStyle.cyberpunk,
+              onTap: () => settings.setThemeStyle(ThemeStyle.cyberpunk),
+              color: const Color(0xFF8B5CF6),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeStyleOption(
+    ThemeData theme,
+    bool isDark, {
+    required IconData icon,
+    required String label,
+    required String description,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? color.withValues(alpha: 0.15)
+                : (isCyberpunk ? AppTheme.surfaceDark : theme.cardColor),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 12),
+            border: Border.all(
+              color: isSelected
+                  ? color
+                  : AppTheme.themeTextSecondary.withValues(alpha: 0.3),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: isSelected && isCyberpunk
+                ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? color : AppTheme.themeTextSecondary,
+                size: 24,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isCyberpunk ? label.toUpperCase() : label,
+                style: AppTheme.getBodyTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected ? color : AppTheme.themeTextSecondary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: AppTheme.getBodyTextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.themeTextSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildThemeOption(
     ThemeData theme,
     bool isDark, {
@@ -563,6 +728,8 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     required VoidCallback onTap,
     required Color color,
   }) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -572,15 +739,15 @@ class _SettingsDrawerState extends State<SettingsDrawer>
           decoration: BoxDecoration(
             color: isSelected
                 ? color.withValues(alpha: 0.2)
-                : AppTheme.surfaceDark,
-            borderRadius: BorderRadius.circular(4),
+                : (isCyberpunk ? AppTheme.surfaceDark : theme.cardColor),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 12),
             border: Border.all(
               color: isSelected
                   ? color
-                  : AppTheme.textSecondaryDark.withValues(alpha: 0.3),
+                  : AppTheme.themeTextSecondary.withValues(alpha: 0.3),
               width: isSelected ? 2 : 1,
             ),
-            boxShadow: isSelected
+            boxShadow: isSelected && isCyberpunk
                 ? [
                     BoxShadow(
                       color: color.withValues(alpha: 0.3),
@@ -593,17 +760,16 @@ class _SettingsDrawerState extends State<SettingsDrawer>
             children: [
               Icon(
                 icon,
-                color: isSelected ? color : AppTheme.textSecondaryDark,
+                color: isSelected ? color : AppTheme.themeTextSecondary,
                 size: 22,
               ),
               const SizedBox(height: 6),
               Text(
                 label,
-                style: GoogleFonts.rajdhani(
+                style: AppTheme.getBodyTextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? color : AppTheme.textSecondaryDark,
-                  letterSpacing: 1,
+                  color: isSelected ? color : AppTheme.themeTextSecondary,
                 ),
               ),
             ],
@@ -624,40 +790,41 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     Widget? suffixIcon,
     Function(String)? onChanged,
   }) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
-          style: GoogleFonts.rajdhani(
+          isCyberpunk ? label.toUpperCase() : label,
+          style: AppTheme.getBodyTextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondaryDark,
-            letterSpacing: 1,
+            color: AppTheme.themeTextSecondary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: AppTheme.primaryColor.withValues(alpha: 0.3),
-            ),
+            color: isCyberpunk ? AppTheme.surfaceDark : theme.cardColor,
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 12),
+            border: Border.all(color: accentColor.withValues(alpha: 0.3)),
           ),
           child: TextField(
             controller: controller,
             obscureText: isPassword,
-            style: GoogleFonts.rajdhani(
-              color: AppTheme.textPrimaryDark,
+            style: AppTheme.getBodyTextStyle(
               fontSize: 14,
+              color: AppTheme.themeTextPrimary,
             ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.rajdhani(
-                color: AppTheme.textSecondaryDark.withValues(alpha: 0.5),
+              hintStyle: AppTheme.getBodyTextStyle(
+                fontSize: 14,
+                color: AppTheme.themeTextSecondary.withValues(alpha: 0.5),
               ),
-              prefixIcon: Icon(icon, color: AppTheme.primaryColor, size: 20),
+              prefixIcon: Icon(icon, color: accentColor, size: 20),
               suffixIcon: suffixIcon,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
@@ -665,7 +832,7 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                 vertical: 14,
               ),
             ),
-            cursorColor: AppTheme.primaryColor,
+            cursorColor: accentColor,
             onChanged: onChanged,
           ),
         ),
@@ -677,12 +844,17 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     BuildContext context,
     ChatProvider chatProvider,
   ) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+
     return SizedBox(
       width: double.infinity,
       child: CyberpunkButton(
-        text: _isTestingConnection ? 'TESTING...' : 'TEST CONNECTION',
+        text: _isTestingConnection
+            ? (isCyberpunk ? 'TESTING...' : 'Testing...')
+            : (isCyberpunk ? 'TEST CONNECTION' : 'Test Connection'),
         icon: Icons.network_check,
-        color: AppTheme.primaryColor,
+        color: accentColor,
         isLoading: _isTestingConnection,
         onPressed: _isTestingConnection
             ? null
@@ -696,15 +868,20 @@ class _SettingsDrawerState extends State<SettingsDrawer>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        success ? 'CONNECTION SUCCESSFUL' : 'CONNECTION FAILED',
-                        style: GoogleFonts.rajdhani(
+                        success
+                            ? (isCyberpunk
+                                  ? 'CONNECTION SUCCESSFUL'
+                                  : 'Connection successful')
+                            : (isCyberpunk
+                                  ? 'CONNECTION FAILED'
+                                  : 'Connection failed'),
+                        style: AppTheme.getBodyTextStyle(
                           color: success
-                              ? AppTheme.successColor
-                              : AppTheme.errorColor,
-                          letterSpacing: 1,
+                              ? AppTheme.themeSuccess
+                              : AppTheme.themeError,
                         ),
                       ),
-                      backgroundColor: AppTheme.cardDark,
+                      backgroundColor: isCyberpunk ? AppTheme.cardDark : null,
                     ),
                   );
                 }
@@ -722,24 +899,27 @@ class _SettingsDrawerState extends State<SettingsDrawer>
     required bool value,
     required Function(bool) onChanged,
   }) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final accentColor = AppTheme.accentColor;
+
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: value
-                ? AppTheme.primaryColor.withValues(alpha: 0.2)
-                : AppTheme.surfaceDark,
-            borderRadius: BorderRadius.circular(4),
+                ? accentColor.withValues(alpha: 0.2)
+                : (isCyberpunk ? AppTheme.surfaceDark : theme.cardColor),
+            borderRadius: BorderRadius.circular(isCyberpunk ? 4 : 8),
             border: Border.all(
               color: value
-                  ? AppTheme.primaryColor.withValues(alpha: 0.5)
-                  : AppTheme.textSecondaryDark.withValues(alpha: 0.3),
+                  ? accentColor.withValues(alpha: 0.5)
+                  : AppTheme.themeTextSecondary.withValues(alpha: 0.3),
             ),
           ),
           child: Icon(
             icon,
-            color: value ? AppTheme.primaryColor : AppTheme.textSecondaryDark,
+            color: value ? accentColor : AppTheme.themeTextSecondary,
             size: 18,
           ),
         ),
@@ -749,21 +929,18 @@ class _SettingsDrawerState extends State<SettingsDrawer>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title.toUpperCase(),
-                style: GoogleFonts.rajdhani(
+                isCyberpunk ? title.toUpperCase() : title,
+                style: AppTheme.getBodyTextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: value
-                      ? AppTheme.primaryColor
-                      : AppTheme.textPrimaryDark,
-                  letterSpacing: 0.5,
+                  color: value ? accentColor : AppTheme.themeTextPrimary,
                 ),
               ),
               Text(
                 subtitle,
-                style: GoogleFonts.rajdhani(
+                style: AppTheme.getBodyTextStyle(
                   fontSize: 11,
-                  color: AppTheme.textSecondaryDark,
+                  color: AppTheme.themeTextSecondary,
                 ),
               ),
             ],
@@ -772,18 +949,22 @@ class _SettingsDrawerState extends State<SettingsDrawer>
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: AppTheme.primaryColor,
-          activeTrackColor: AppTheme.primaryColor.withValues(alpha: 0.3),
-          inactiveThumbColor: AppTheme.textSecondaryDark,
-          inactiveTrackColor: AppTheme.surfaceDark,
+          activeColor: accentColor,
+          activeTrackColor: accentColor.withValues(alpha: 0.3),
+          inactiveThumbColor: AppTheme.themeTextSecondary,
+          inactiveTrackColor: isCyberpunk
+              ? AppTheme.surfaceDark
+              : theme.cardColor,
         ),
       ],
     );
   }
 
   Widget _buildAboutSection(ThemeData theme, bool isDark) {
+    final secondaryAccent = AppTheme.secondaryAccent;
+
     return CyberpunkContainer(
-      glowColor: AppTheme.neonPink,
+      glowColor: secondaryAccent,
       glowIntensity: 0.3,
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -791,15 +972,11 @@ class _SettingsDrawerState extends State<SettingsDrawer>
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.info_outline,
-                color: AppTheme.neonPink,
-                size: 18,
-              ),
+              Icon(Icons.info_outline, color: secondaryAccent, size: 18),
               const SizedBox(width: 10),
               NeonText(
-                text: 'ABOUT',
-                color: AppTheme.neonPink,
+                text: AppTheme.isCyberpunk ? 'ABOUT' : 'About',
+                color: secondaryAccent,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 glowIntensity: 0.5,
@@ -808,30 +985,33 @@ class _SettingsDrawerState extends State<SettingsDrawer>
           ),
           const SizedBox(height: 16),
           Text(
-            'NEURAL LINK v2.0',
-            style: GoogleFonts.orbitron(
+            AppTheme.isCyberpunk ? 'NEURAL LINK v2.0' : 'LMS AI Assistant',
+            style: AppTheme.getHeaderTextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimaryDark,
+              color: AppTheme.themeTextPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'AI-POWERED LEARNING INTERFACE',
-            style: GoogleFonts.rajdhani(
+            AppTheme.isCyberpunk
+                ? 'AI-POWERED LEARNING INTERFACE'
+                : 'AI-Powered Learning Interface',
+            style: AppTheme.getBodyTextStyle(
               fontSize: 11,
-              color: AppTheme.textSecondaryDark,
-              letterSpacing: 2,
+              color: AppTheme.themeTextSecondary,
             ),
           ),
           const SizedBox(height: 12),
-          const CyberpunkDivider(color: AppTheme.neonPink),
+          CyberpunkDivider(color: secondaryAccent),
           const SizedBox(height: 12),
           Text(
-            'Advanced neural network integration for enhanced learning experiences. Powered by cutting-edge AI technology.',
-            style: GoogleFonts.rajdhani(
+            AppTheme.isCyberpunk
+                ? 'Advanced neural network integration for enhanced learning experiences. Powered by cutting-edge AI technology.'
+                : 'Enhanced learning experiences powered by cutting-edge AI technology.',
+            style: AppTheme.getBodyTextStyle(
               fontSize: 12,
-              color: AppTheme.textSecondaryDark,
+              color: AppTheme.themeTextSecondary,
             ),
           ),
         ],
