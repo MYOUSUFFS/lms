@@ -261,21 +261,15 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
           // RAG toggle
           Tooltip(
-            message: documentProvider.hasDocuments
-                ? (settingsProvider.useRag
-                      ? 'RAG enabled - AI uses your documents'
-                      : 'RAG disabled - Click to use documents')
-                : 'Upload documents to enable RAG',
+            message: settingsProvider.useRag
+                ? 'RAG enabled - AI uses your documents'
+                : 'RAG disabled - Click to use documents',
             child: IconButton(
               icon: Icon(
-                documentProvider.hasDocuments && settingsProvider.useRag
-                    ? Icons.library_books
-                    : documentProvider.hasDocuments
+                settingsProvider.useRag
                     ? Icons.library_books_outlined
                     : Icons.chat_bubble_outline,
-                color: documentProvider.hasDocuments && settingsProvider.useRag
-                    ? AppTheme.primaryColor
-                    : null,
+                color: settingsProvider.useRag ? AppTheme.primaryColor : null,
               ),
               onPressed: () => settingsProvider.toggleRag(),
             ),
