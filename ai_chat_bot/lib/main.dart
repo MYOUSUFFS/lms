@@ -12,8 +12,8 @@ import 'features/learning_assistant/learning_assistant_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configure Google Fonts to use only cached fonts (no network requests)
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Allow Google Fonts to fetch fonts at runtime
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   // Initialize services
   final storageService = StorageService();
@@ -51,6 +51,8 @@ class AIChatBotApp extends StatelessWidget {
     final settings = context.watch<SettingsProvider>();
 
     return MaterialApp(
+      // Use color theme id as key to force rebuild when theme changes
+      key: ValueKey(settings.colorTheme.id),
       title: 'LMS AI Assistant',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

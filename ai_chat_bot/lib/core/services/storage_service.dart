@@ -8,6 +8,7 @@ class StorageService {
   static const String _apiKeyKey = 'api_key';
   static const String _baseUrlKey = 'base_url';
   static const String _themeKey = 'theme_mode';
+  static const String _colorThemeKey = 'color_theme';
 
   late SharedPreferences _prefs;
   bool _initialized = false;
@@ -88,6 +89,17 @@ class StorageService {
   Future<void> setThemeMode(String mode) async {
     await init();
     await _prefs.setString(_themeKey, mode);
+  }
+
+  // Color Theme
+  Future<String> getColorTheme() async {
+    await init();
+    return _prefs.getString(_colorThemeKey) ?? 'electric_blue';
+  }
+
+  Future<void> setColorTheme(String themeId) async {
+    await init();
+    await _prefs.setString(_colorThemeKey, themeId);
   }
 
   Future<void> clearAll() async {

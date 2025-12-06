@@ -109,7 +109,7 @@ class _AddDocumentDialogState extends State<AddDocumentDialog>
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.add_circle_outline,
               color: AppTheme.primaryColor,
               size: 24,
@@ -288,7 +288,6 @@ class _AddDocumentDialogState extends State<AddDocumentDialog>
   }
 
   Widget _buildPasteTextTab(BuildContext context, DocumentProvider provider) {
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -435,9 +434,7 @@ class _AddDocumentDialogState extends State<AddDocumentDialog>
           LinearProgressIndicator(
             value: provider.uploadProgress > 0 ? provider.uploadProgress : null,
             backgroundColor: Colors.grey.shade200,
-            valueColor: const AlwaysStoppedAnimation<Color>(
-              AppTheme.primaryColor,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
           ),
           const SizedBox(height: 8),
           const Text('Processing document...'),

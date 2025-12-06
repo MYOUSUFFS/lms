@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
+import '../models/color_theme.dart';
+import '../theme/app_theme.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final StorageService _storage;
@@ -9,6 +11,7 @@ class SettingsProvider extends ChangeNotifier {
   String _baseUrl = 'http://localhost:8000';
   bool _useStreaming = true; // Enabled by default for real-time streaming
   bool _useRag = false;
+  ColorThemeOption _colorTheme = ColorThemes.defaultTheme;
 
   SettingsProvider(this._storage);
 
@@ -17,6 +20,7 @@ class SettingsProvider extends ChangeNotifier {
   String get baseUrl => _baseUrl;
   bool get useStreaming => _useStreaming;
   bool get useRag => _useRag;
+  ColorThemeOption get colorTheme => _colorTheme;
 
   Future<void> init() async {
     await _storage.init();
@@ -26,6 +30,11 @@ class SettingsProvider extends ChangeNotifier {
 
     _apiKey = await _storage.getApiKey() ?? '';
     _baseUrl = await _storage.getBaseUrl() ?? 'http://localhost:8000';
+
+    // Load color theme
+    final colorThemeId = await _storage.getColorTheme();
+    _colorTheme = ColorThemes.getById(colorThemeId);
+    AppTheme.setColorTheme(_colorTheme);
 
     notifyListeners();
   }
@@ -83,5 +92,19 @@ class SettingsProvider extends ChangeNotifier {
   void toggleRag() {
     _useRag = !_useRag;
     notifyListeners();
+  }
+
+  /// Set the color theme
+  Future<void> setColorTheme(ColorThemeOption theme) async {
+    _colorTheme = theme;
+    AppTheme.setColorTheme(theme);
+    await _storage.setColorTheme(theme.id);
+    notifyListeners();
+  }
+
+  /// Set the color theme by ID
+  Future<void> setColorThemeById(String themeId) async {
+    final theme = ColorThemes.getById(themeId);
+    await setColorTheme(theme);
   }
 }

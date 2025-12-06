@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/cyberpunk_widgets.dart';
 
 class ChatSidebar extends StatelessWidget {
   final VoidCallback onNewChat;
@@ -16,13 +18,17 @@ class ChatSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final chatProvider = context.watch<ChatProvider>();
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        border: Border(right: BorderSide(color: theme.dividerColor, width: 1)),
+        color: AppTheme.backgroundDark,
+        border: Border(
+          right: BorderSide(
+            color: AppTheme.primaryColor.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
       ),
       child: Column(
         children: [
@@ -31,71 +37,99 @@ class ChatSidebar extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Logo and title
+                // Cyberpunk logo and title
                 Row(
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [
-                            AppTheme.primaryColor,
-                            AppTheme.primaryLight,
-                          ],
+                          colors: [AppTheme.neonPink, AppTheme.primaryColor],
                         ),
                         borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.smart_toy_outlined,
-                        size: 20,
+                        Icons.psychology_outlined,
+                        size: 22,
                         color: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'LMS Chat',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          NeonText(
+                            text: 'LMS CHAT',
+                            color: AppTheme.primaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            glowIntensity: 0.8,
+                          ),
+                          Text(
+                            'v2.0 NEURAL',
+                            style: GoogleFonts.rajdhani(
+                              fontSize: 10,
+                              color: AppTheme.textSecondaryDark,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      onPressed: onOpenSettings,
-                      icon: const Icon(Icons.settings_outlined),
-                      tooltip: 'Settings',
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.neonPink.withValues(alpha: 0.1),
+                        border: Border.all(
+                          color: AppTheme.neonPink.withValues(alpha: 0.5),
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: IconButton(
+                        onPressed: onOpenSettings,
+                        icon: const Icon(
+                          Icons.tune,
+                          color: AppTheme.neonPink,
+                          size: 20,
+                        ),
+                        tooltip: 'SETTINGS',
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // New chat button
+                // Cyberpunk new chat button
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
+                  child: CyberpunkButton(
+                    text: 'NEW SESSION',
+                    icon: Icons.add,
+                    color: AppTheme.primaryColor,
+                    filled: true,
                     onPressed: onNewChat,
-                    icon: const Icon(Icons.add, size: 20),
-                    label: const Text('New Chat'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          const Divider(height: 1),
+          // Cyberpunk divider
+          CyberpunkDivider(color: AppTheme.primaryColor),
 
           // Conversations list
           Expanded(
             child: chatProvider.conversations.isEmpty
-                ? _buildEmptyState(theme)
+                ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: chatProvider.conversations.length,
@@ -129,29 +163,38 @@ class ChatSidebar extends StatelessWidget {
           ),
 
           // Footer
-          const Divider(height: 1),
+          const CyberpunkDivider(color: AppTheme.textSecondaryDark),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: theme.textTheme.bodySmall?.color,
+                  Icons.storage_outlined,
+                  size: 14,
+                  color: AppTheme.textSecondaryDark,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${chatProvider.conversations.length} conversations',
-                    style: theme.textTheme.bodySmall,
+                    '${chatProvider.conversations.length} SESSIONS',
+                    style: GoogleFonts.rajdhani(
+                      fontSize: 11,
+                      color: AppTheme.textSecondaryDark,
+                      letterSpacing: 1,
+                    ),
                   ),
                 ),
                 if (chatProvider.conversations.isNotEmpty)
-                  TextButton(
-                    onPressed: () => _showClearAllDialog(context, chatProvider),
-                    child: const Text(
-                      'Clear All',
-                      style: TextStyle(fontSize: 12),
+                  GestureDetector(
+                    onTap: () => _showClearAllDialog(context, chatProvider),
+                    child: Text(
+                      'PURGE ALL',
+                      style: GoogleFonts.rajdhani(
+                        fontSize: 11,
+                        color: AppTheme.errorColor,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
               ],
@@ -162,29 +205,42 @@ class ChatSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildEmptyState() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 48,
-              color: theme.textTheme.bodySmall?.color,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No conversations yet',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.textTheme.bodySmall?.color,
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                ),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Icon(
+                Icons.chat_bubble_outline,
+                size: 40,
+                color: AppTheme.primaryColor.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 20),
+            NeonText(
+              text: 'NO SESSIONS',
+              color: AppTheme.textSecondaryDark,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              glowIntensity: 0.3,
             ),
             const SizedBox(height: 8),
             Text(
-              'Start a new chat to begin',
-              style: theme.textTheme.bodySmall,
+              'Initialize new session to begin',
+              style: GoogleFonts.rajdhani(
+                fontSize: 12,
+                color: AppTheme.textSecondaryDark.withValues(alpha: 0.7),
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -216,22 +272,36 @@ class ChatSidebar extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Conversation'),
-        content: const Text(
-          'Are you sure you want to delete this conversation?',
+        backgroundColor: AppTheme.cardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+        ),
+        title: NeonText(
+          text: 'TERMINATE SESSION',
+          color: AppTheme.errorColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          glowIntensity: 0.8,
+        ),
+        content: Text(
+          'This action will permanently delete the session data.',
+          style: GoogleFonts.rajdhani(color: AppTheme.textSecondaryDark),
         ),
         actions: [
-          TextButton(
+          CyberpunkButton(
+            text: 'Cancel',
+            color: AppTheme.textSecondaryDark,
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-          TextButton(
+          CyberpunkButton(
+            text: 'Terminate',
+            color: AppTheme.errorColor,
+            filled: true,
             onPressed: () {
               chatProvider.deleteConversation(conversationId);
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
-            child: const Text('Delete'),
           ),
         ],
       ),
@@ -242,22 +312,36 @@ class ChatSidebar extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear All Conversations'),
-        content: const Text(
-          'Are you sure you want to delete all conversations? This action cannot be undone.',
+        backgroundColor: AppTheme.cardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+        ),
+        title: NeonText(
+          text: 'PURGE ALL DATA',
+          color: AppTheme.errorColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          glowIntensity: 0.8,
+        ),
+        content: Text(
+          'WARNING: This will permanently erase all session data. This action cannot be reversed.',
+          style: GoogleFonts.rajdhani(color: AppTheme.textSecondaryDark),
         ),
         actions: [
-          TextButton(
+          CyberpunkButton(
+            text: 'Abort',
+            color: AppTheme.textSecondaryDark,
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-          TextButton(
+          CyberpunkButton(
+            text: 'Purge',
+            color: AppTheme.errorColor,
+            filled: true,
             onPressed: () {
               chatProvider.clearAllConversations();
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
-            child: const Text('Clear All'),
           ),
         ],
       ),
@@ -293,38 +377,57 @@ class _ConversationTileState extends State<_ConversationTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: widget.isSelected
                 ? AppTheme.primaryColor.withValues(alpha: 0.1)
                 : _isHovered
-                ? theme.hoverColor
+                ? AppTheme.primaryColor.withValues(alpha: 0.05)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: widget.isSelected
-                ? Border.all(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                  )
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: widget.isSelected
+                  ? AppTheme.primaryColor.withValues(alpha: 0.6)
+                  : _isHovered
+                  ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                  : Colors.transparent,
+            ),
+            boxShadow: widget.isSelected
+                ? [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ]
                 : null,
           ),
           child: Row(
             children: [
-              // Icon
-              Icon(
-                widget.useRag ? Icons.library_books : Icons.chat_bubble_outline,
-                size: 18,
-                color: widget.isSelected
-                    ? AppTheme.primaryColor
-                    : theme.textTheme.bodySmall?.color,
+              // Cyberpunk icon
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: widget.useRag
+                      ? AppTheme.neonPurple.withValues(alpha: 0.2)
+                      : AppTheme.primaryColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  widget.useRag ? Icons.memory : Icons.terminal,
+                  size: 14,
+                  color: widget.useRag
+                      ? AppTheme.neonPurple
+                      : AppTheme.primaryColor,
+                ),
               ),
               const SizedBox(width: 12),
 
@@ -334,11 +437,16 @@ class _ConversationTileState extends State<_ConversationTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      widget.title.toUpperCase(),
+                      style: GoogleFonts.rajdhani(
+                        fontSize: 13,
                         fontWeight: widget.isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                        color: widget.isSelected
+                            ? AppTheme.primaryColor
+                            : AppTheme.textPrimaryDark,
+                        letterSpacing: 0.5,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -349,8 +457,9 @@ class _ConversationTileState extends State<_ConversationTile> {
                         Expanded(
                           child: Text(
                             widget.preview,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.textTheme.bodySmall?.color,
+                            style: GoogleFonts.rajdhani(
+                              fontSize: 11,
+                              color: AppTheme.textSecondaryDark,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -358,8 +467,10 @@ class _ConversationTileState extends State<_ConversationTile> {
                         ),
                         Text(
                           widget.time,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
+                          style: GoogleFonts.rajdhani(
+                            fontSize: 10,
+                            color: AppTheme.textSecondaryDark,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ],
@@ -371,15 +482,18 @@ class _ConversationTileState extends State<_ConversationTile> {
               // Delete button (show on hover)
               if (_isHovered)
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 18),
+                  icon: Icon(
+                    Icons.delete_outline,
+                    size: 16,
+                    color: AppTheme.errorColor.withValues(alpha: 0.8),
+                  ),
                   onPressed: widget.onDelete,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
+                    minWidth: 28,
+                    minHeight: 28,
                   ),
-                  splashRadius: 16,
-                  color: AppTheme.errorColor,
+                  splashRadius: 14,
                 ),
             ],
           ),

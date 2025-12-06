@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/document.dart';
 import '../../../core/providers/document_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/cyberpunk_widgets.dart';
 import '../screens/document_viewer_screen.dart';
 import 'add_document_dialog.dart';
 
@@ -41,13 +43,14 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final provider = context.watch<DocumentProvider>();
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        border: Border(right: BorderSide(color: theme.dividerColor)),
+        color: AppTheme.backgroundDark,
+        border: Border(
+          left: BorderSide(color: AppTheme.neonPurple.withValues(alpha: 0.2)),
+        ),
       ),
       child: Column(
         children: [
@@ -65,54 +68,82 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
   }
 
   Widget _buildHeader(BuildContext context, DocumentProvider provider) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.cardColor,
-        border: Border(bottom: BorderSide(color: theme.dividerColor)),
+        color: AppTheme.cardDark,
+        border: Border(
+          bottom: BorderSide(color: AppTheme.neonPurple.withValues(alpha: 0.3)),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.neonPurple.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(Icons.folder_outlined, color: AppTheme.primaryColor, size: 24),
-          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.neonPurple.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: AppTheme.neonPurple.withValues(alpha: 0.5),
+              ),
+            ),
+            child: const Icon(
+              Icons.storage_outlined,
+              color: AppTheme.neonPurple,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Documents',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                NeonText(
+                  text: 'DATA VAULT',
+                  color: AppTheme.neonPurple,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  glowIntensity: 0.8,
                 ),
                 Text(
-                  '${provider.documentCount} learning materials',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withValues(
-                      alpha: 0.7,
-                    ),
+                  '${provider.documentCount} FILES LOADED',
+                  style: GoogleFonts.rajdhani(
+                    fontSize: 11,
+                    color: AppTheme.textSecondaryDark,
+                    letterSpacing: 1,
                   ),
                 ),
               ],
             ),
           ),
           // Add document button
-          IconButton(
-            onPressed: () => AddDocumentDialog.show(
-              context,
-              onDocumentAdded: () => provider.fetchDocuments(),
+          Container(
+            decoration: BoxDecoration(
+              color: AppTheme.neonPurple.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: AppTheme.neonPurple),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.neonPurple.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                ),
+              ],
             ),
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
-                borderRadius: BorderRadius.circular(8),
+            child: IconButton(
+              onPressed: () => AddDocumentDialog.show(
+                context,
+                onDocumentAdded: () => provider.fetchDocuments(),
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 18),
+              icon: const Icon(Icons.add, color: AppTheme.neonPurple, size: 20),
+              tooltip: 'ADD FILE',
             ),
-            tooltip: 'Add Document',
           ),
         ],
       ),
@@ -120,55 +151,82 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
   }
 
   Widget _buildSearchBar(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.all(12),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: 'Search documents...',
-          prefixIcon: Icon(
-            Icons.search,
-            size: 20,
-            color: theme.iconTheme.color?.withValues(alpha: 0.5),
-          ),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear, size: 18),
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() => _searchQuery = '');
-                  },
-                )
-              : null,
-          filled: true,
-          fillColor: theme.cardColor,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: theme.dividerColor),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: theme.dividerColor),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: AppTheme.primaryColor),
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceDark,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: AppTheme.neonPurple.withValues(alpha: 0.3)),
         ),
-        onChanged: (value) => setState(() => _searchQuery = value),
+        child: TextField(
+          controller: _searchController,
+          style: GoogleFonts.rajdhani(
+            color: AppTheme.textPrimaryDark,
+            fontSize: 14,
+          ),
+          decoration: InputDecoration(
+            hintText: 'SEARCH FILES...',
+            hintStyle: GoogleFonts.rajdhani(
+              color: AppTheme.textSecondaryDark.withValues(alpha: 0.5),
+              letterSpacing: 1,
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              size: 18,
+              color: AppTheme.neonPurple.withValues(alpha: 0.7),
+            ),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      size: 16,
+                      color: AppTheme.errorColor.withValues(alpha: 0.7),
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = '');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
+          ),
+          cursorColor: AppTheme.neonPurple,
+          onChanged: (value) => setState(() => _searchQuery = value),
+        ),
       ),
     );
   }
 
   Widget _buildDocumentList(BuildContext context, DocumentProvider provider) {
     if (provider.isLoading && provider.documents.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.neonPurple,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'LOADING DATA...',
+              style: GoogleFonts.rajdhani(
+                color: AppTheme.neonPurple,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     final documents = _searchQuery.isEmpty
@@ -181,6 +239,8 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
 
     return RefreshIndicator(
       onRefresh: provider.fetchDocuments,
+      color: AppTheme.neonPurple,
+      backgroundColor: AppTheme.cardDark,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         itemCount: documents.length,
@@ -194,8 +254,6 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
   }
 
   Widget _buildEmptyState(BuildContext context, DocumentProvider provider) {
-    final theme = Theme.of(context);
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -205,46 +263,45 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.neonPurple.withValues(alpha: 0.3),
+                ),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.folder_open,
                 size: 40,
-                color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                color: AppTheme.neonPurple.withValues(alpha: 0.5),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              _searchQuery.isNotEmpty ? 'No results found' : 'No documents yet',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            const SizedBox(height: 20),
+            NeonText(
+              text: _searchQuery.isNotEmpty ? 'NO RESULTS' : 'VAULT EMPTY',
+              color: AppTheme.textSecondaryDark,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              glowIntensity: 0.3,
             ),
             const SizedBox(height: 8),
             Text(
               _searchQuery.isNotEmpty
-                  ? 'Try a different search term'
-                  : 'Add learning materials to get started',
-              style: theme.textTheme.bodySmall,
+                  ? 'Modify search parameters'
+                  : 'Upload files to initialize',
+              style: GoogleFonts.rajdhani(
+                fontSize: 12,
+                color: AppTheme.textSecondaryDark.withValues(alpha: 0.7),
+              ),
               textAlign: TextAlign.center,
             ),
             if (_searchQuery.isEmpty) ...[
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
+              const SizedBox(height: 24),
+              CyberpunkButton(
+                text: 'Add File',
+                icon: Icons.add,
+                color: AppTheme.neonPurple,
                 onPressed: () => AddDocumentDialog.show(
                   context,
                   onDocumentAdded: () => provider.fetchDocuments(),
-                ),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add Document'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
                 ),
               ),
             ],
@@ -260,15 +317,13 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
     bool isSelected,
     DocumentProvider provider,
   ) {
-    final theme = Theme.of(context);
+    final typeColor = _getDocumentTypeColor(document.documentType);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Material(
-        color: isSelected
-            ? AppTheme.primaryColor.withValues(alpha: 0.1)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(4),
         child: InkWell(
           onTap: () {
             // Open document viewer
@@ -281,33 +336,45 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
             // Also notify selection callback if provided
             widget.onDocumentSelected?.call(document);
           },
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
+          borderRadius: BorderRadius.circular(4),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: isSelected
-                  ? Border.all(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                    )
+              color: isSelected
+                  ? typeColor.withValues(alpha: 0.1)
+                  : AppTheme.surfaceDark.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: isSelected
+                    ? typeColor.withValues(alpha: 0.6)
+                    : AppTheme.textSecondaryDark.withValues(alpha: 0.2),
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: typeColor.withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        spreadRadius: 0,
+                      ),
+                    ]
                   : null,
             ),
             child: Row(
               children: [
-                // Document type icon
+                // Document type icon with cyberpunk styling
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: _getDocumentTypeColor(
-                      document.documentType,
-                    ).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: typeColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: typeColor.withValues(alpha: 0.5)),
                   ),
                   child: Center(
                     child: Text(
                       document.documentType.icon,
-                      style: const TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
@@ -319,9 +386,13 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        document.filename,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
+                        document.filename.toUpperCase(),
+                        style: GoogleFonts.rajdhani(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? typeColor
+                              : AppTheme.textPrimaryDark,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -332,11 +403,11 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
                           _buildStatusDot(document.status),
                           const SizedBox(width: 6),
                           Text(
-                            '${document.chunksCount} chunks',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.textTheme.bodySmall?.color
-                                  ?.withValues(alpha: 0.6),
-                              fontSize: 11,
+                            '${document.chunksCount} CHUNKS',
+                            style: GoogleFonts.rajdhani(
+                              fontSize: 10,
+                              color: AppTheme.textSecondaryDark,
+                              letterSpacing: 1,
                             ),
                           ),
                         ],
@@ -345,19 +416,26 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
                   ),
                 ),
 
-                // Delete button (on hover or always visible)
-                IconButton(
-                  onPressed: () => _confirmDelete(context, document, provider),
-                  icon: Icon(
-                    Icons.delete_outline,
-                    size: 18,
-                    color: theme.iconTheme.color?.withValues(alpha: 0.4),
+                // Delete button
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.errorColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  tooltip: 'Delete',
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
+                  child: IconButton(
+                    onPressed: () =>
+                        _confirmDelete(context, document, provider),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: AppTheme.errorColor.withValues(alpha: 0.7),
+                    ),
+                    tooltip: 'DELETE',
+                    padding: const EdgeInsets.all(4),
+                    constraints: const BoxConstraints(
+                      minWidth: 28,
+                      minHeight: 28,
+                    ),
                   ),
                 ),
               ],
@@ -381,31 +459,43 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
         color = AppTheme.errorColor;
         break;
       case ProcessingStatus.pending:
-        color = Colors.grey;
+        color = AppTheme.textSecondaryDark;
         break;
     }
 
     return Container(
       width: 6,
       height: 6,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: status == ProcessingStatus.completed
+            ? [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.5),
+                  blurRadius: 4,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
     );
   }
 
   Color _getDocumentTypeColor(DocumentType type) {
     switch (type) {
       case DocumentType.pdf:
-        return Colors.red;
+        return AppTheme.neonRed;
       case DocumentType.txt:
-        return Colors.blue;
+        return AppTheme.primaryColor;
       case DocumentType.html:
-        return Colors.orange;
+        return AppTheme.neonOrange;
       case DocumentType.csv:
-        return Colors.green;
+        return AppTheme.neonGreen;
       case DocumentType.image:
-        return Colors.purple;
+        return AppTheme.neonPurple;
       case DocumentType.url:
-        return Colors.teal;
+        return AppTheme.neonPink;
     }
   }
 
@@ -417,16 +507,32 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Document'),
+        backgroundColor: AppTheme.cardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+        ),
+        title: NeonText(
+          text: 'DELETE FILE',
+          color: AppTheme.errorColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          glowIntensity: 0.8,
+        ),
         content: Text(
-          'Are you sure you want to delete "${document.filename}"?',
+          'Permanently remove "${document.filename}" from vault?',
+          style: GoogleFonts.rajdhani(color: AppTheme.textSecondaryDark),
         ),
         actions: [
-          TextButton(
+          CyberpunkButton(
+            text: 'Cancel',
+            color: AppTheme.textSecondaryDark,
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-          TextButton(
+          CyberpunkButton(
+            text: 'Delete',
+            color: AppTheme.errorColor,
+            filled: true,
             onPressed: () {
               Navigator.pop(context);
               provider.deleteDocument(document.documentId);
@@ -434,11 +540,18 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
                 widget.onDocumentSelected?.call(null);
               }
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${document.filename} deleted')),
+                SnackBar(
+                  content: Text(
+                    'FILE REMOVED: ${document.filename}',
+                    style: GoogleFonts.rajdhani(
+                      color: AppTheme.errorColor,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  backgroundColor: AppTheme.cardDark,
+                ),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
-            child: const Text('Delete'),
           ),
         ],
       ),

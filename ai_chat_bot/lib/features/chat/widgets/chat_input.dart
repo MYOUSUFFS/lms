@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 
 class ChatInput extends StatefulWidget {
@@ -52,19 +53,29 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: theme.dividerColor, width: 1)),
+        color: AppTheme.cardDark,
+        border: Border(
+          top: BorderSide(
+            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Text input
+            // Text input with cyberpunk styling
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -82,31 +93,55 @@ class _ChatInputState extends State<ChatInput> {
                         }
                         return KeyEventResult.ignored;
                       },
-                      child: TextField(
-                        controller: _controller,
-                        focusNode: _focusNode,
-                        maxLines: 5,
-                        minLines: 1,
-                        textInputAction: TextInputAction.newline,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          hintText: 'Type a message...',
-                          border: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.transparent),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundDark,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: _focusNode.hasFocus
+                                ? AppTheme.primaryColor
+                                : AppTheme.primaryColor.withValues(alpha: 0.3),
+                            width: _focusNode.hasFocus ? 2 : 1,
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide(color: theme.dividerColor),
+                          boxShadow: _focusNode.hasFocus
+                              ? [
+                                  BoxShadow(
+                                    color: AppTheme.primaryColor.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    blurRadius: 8,
+                                    spreadRadius: 0,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          maxLines: 5,
+                          minLines: 1,
+                          textInputAction: TextInputAction.newline,
+                          keyboardType: TextInputType.multiline,
+                          style: GoogleFonts.rajdhani(
+                            color: AppTheme.textPrimaryDark,
+                            fontSize: 15,
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide(
-                              color: AppTheme.primaryColor,
+                          cursorColor: AppTheme.primaryColor,
+                          decoration: InputDecoration(
+                            hintText: 'ENTER QUERY...',
+                            hintStyle: GoogleFonts.rajdhani(
+                              color: AppTheme.textSecondaryDark.withValues(
+                                alpha: 0.5,
+                              ),
+                              letterSpacing: 1,
                             ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -118,38 +153,55 @@ class _ChatInputState extends State<ChatInput> {
 
             const SizedBox(width: 12),
 
-            // Send button
+            // Cyberpunk send button
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 48,
               height: 48,
               decoration: BoxDecoration(
                 color: _hasText && !widget.isLoading
-                    ? AppTheme.primaryColor
-                    : theme.disabledColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(24),
+                    ? AppTheme.neonPink.withValues(alpha: 0.2)
+                    : AppTheme.surfaceDark,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: _hasText && !widget.isLoading
+                      ? AppTheme.neonPink
+                      : AppTheme.textSecondaryDark.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+                boxShadow: _hasText && !widget.isLoading
+                    ? [
+                        BoxShadow(
+                          color: AppTheme.neonPink.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          spreadRadius: 0,
+                        ),
+                      ]
+                    : null,
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _hasText && !widget.isLoading ? _handleSend : null,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(4),
                   child: Center(
                     child: widget.isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppTheme.neonPink,
                             ),
                           )
                         : Icon(
                             Icons.send_rounded,
                             color: _hasText
-                                ? Colors.white
-                                : theme.disabledColor,
-                            size: 22,
+                                ? AppTheme.neonPink
+                                : AppTheme.textSecondaryDark.withValues(
+                                    alpha: 0.5,
+                                  ),
+                            size: 20,
                           ),
                   ),
                 ),
