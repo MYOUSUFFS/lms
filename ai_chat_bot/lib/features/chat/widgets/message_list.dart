@@ -38,6 +38,7 @@ class _MessageListState extends State<MessageList> {
     final chatProvider = context.watch<ChatProvider>();
     final messages = chatProvider.currentMessages;
     final streamingContent = chatProvider.streamingContent;
+    final isLoading = chatProvider.isLoading;
 
     // Auto scroll when new messages arrive
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,13 +47,20 @@ class _MessageListState extends State<MessageList> {
       }
     });
 
+    // Calculate item count: messages + streaming message + typing indicator
+    final showTypingIndicator = isLoading && streamingContent.isEmpty;
+    final itemCount =
+        messages.length +
+        (streamingContent.isNotEmpty ? 1 : 0) +
+        (showTypingIndicator ? 1 : 0);
+
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      itemCount: messages.length + (streamingContent.isNotEmpty ? 1 : 0),
+      itemCount: itemCount,
       itemBuilder: (context, index) {
         // Show streaming message
-        if (index == messages.length && streamingContent.isNotEmpty) {
+        if (streamingContent.isNotEmpty && index == messages.length) {
           return _MessageBubble(
             message: Message(
               content: streamingContent,
@@ -61,6 +69,11 @@ class _MessageListState extends State<MessageList> {
             ),
             isStreaming: true,
           );
+        }
+
+        // Show typing indicator
+        if (showTypingIndicator && index == messages.length) {
+          return const _TypingIndicator();
         }
 
         return _MessageBubble(message: messages[index]);
@@ -605,6 +618,148 @@ class _PulsingDotState extends State<_PulsingDot>
                     ),
                   ]
                 : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _TypingIndicator extends StatelessWidget {
+  const _TypingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final theme = Theme.of(context);
+    final accentColor = AppTheme.accentColor;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Assistant avatar
+          _CyberpunkAvatar(isUser: false),
+          const SizedBox(width: 12),
+
+          // Typing indicator bubble
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isCyberpunk ? AppTheme.cardDark : theme.cardColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(isCyberpunk ? 4 : 16),
+                topRight: Radius.circular(isCyberpunk ? 4 : 16),
+                bottomLeft: const Radius.circular(0),
+                bottomRight: Radius.circular(isCyberpunk ? 4 : 16),
+              ),
+              border: isCyberpunk
+                  ? Border.all(
+                      color: accentColor.withValues(alpha: 0.3),
+                      width: 1,
+                    )
+                  : null,
+              boxShadow: isCyberpunk
+                  ? [
+                      BoxShadow(
+                        color: accentColor.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                      ),
+                    ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _AnimatedDot(delay: 0),
+                const SizedBox(width: 4),
+                _AnimatedDot(delay: 200),
+                const SizedBox(width: 4),
+                _AnimatedDot(delay: 400),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedDot extends StatefulWidget {
+  final int delay;
+
+  const _AnimatedDot({required this.delay});
+
+  @override
+  State<_AnimatedDot> createState() => _AnimatedDotState();
+}
+
+class _AnimatedDotState extends State<_AnimatedDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _animation = Tween<double>(
+      begin: 0.4,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    // Add delay before starting animation
+    Future.delayed(Duration(milliseconds: widget.delay), () {
+      if (mounted) {
+        _controller.repeat(reverse: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCyberpunk = AppTheme.isCyberpunk;
+    final color = isCyberpunk ? AppTheme.primaryColor : AppTheme.accentColor;
+
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _animation.value,
+          child: Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: isCyberpunk
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.5 * _animation.value),
+                        blurRadius: 4,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
           ),
         );
       },

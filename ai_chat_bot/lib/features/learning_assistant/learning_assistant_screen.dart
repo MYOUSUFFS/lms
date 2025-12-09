@@ -266,37 +266,38 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    if (documentProvider.hasDocuments) ...[
-                      Text(
-                        isCyberpunk
-                            ? '${documentProvider.documentCount} DOCS'
-                            : '${documentProvider.documentCount} docs',
-                        style: isCyberpunk
-                            ? GoogleFonts.rajdhani(
-                                fontSize: 11,
-                                color: AppTheme.successColor,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1,
-                              )
-                            : TextStyle(
-                                fontSize: 12,
-                                color: Colors.green[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 4,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: isCyberpunk
-                              ? AppTheme.textSecondaryDark
-                              : Colors.grey,
-                          shape: BoxShape.circle,
+                    if (isWideScreen && isMediumScreen)
+                      if (documentProvider.hasDocuments) ...[
+                        Text(
+                          isCyberpunk
+                              ? '${documentProvider.documentCount} DOCS'
+                              : '${documentProvider.documentCount} docs',
+                          style: isCyberpunk
+                              ? GoogleFonts.rajdhani(
+                                  fontSize: 11,
+                                  color: AppTheme.successColor,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1,
+                                )
+                              : TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.green[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 4,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: isCyberpunk
+                                ? AppTheme.textSecondaryDark
+                                : Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                     CyberpunkStatusIndicator(
                       isActive: chatProvider.isConnected,
                       size: 6,

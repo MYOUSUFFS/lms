@@ -56,7 +56,7 @@ cp .env.example .env
 ### Option 1: Development Mode (with auto-reload)
 
 ```bash
-cd /Users/jdmobileapp/Project/lms
+cd /Users/jdmobileapp/Shared/lms
 source venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -64,7 +64,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ### Option 2: Production Mode
 
 ```bash
-cd /Users/jdmobileapp/Project/lms
+cd /Users/jdmobileapp/Shared/lms
 source venv/bin/activate
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
@@ -72,14 +72,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 ### Option 3: Using Docker (Development)
 
 ```bash
-cd /Users/jdmobileapp/Project/lms
+cd /Users/jdmobileapp/Shared/lms
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
 ### Option 4: Using Docker (Production)
 
 ```bash
-cd /Users/jdmobileapp/Project/lms
+cd /Users/jdmobileapp/Shared/lms
 docker-compose up -d --build
 ```
 

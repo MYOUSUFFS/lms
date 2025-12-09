@@ -291,7 +291,7 @@ class ChatSidebar extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: isCyberpunk
             ? AppTheme.cardDark
-            : Theme.of(context).dialogBackgroundColor,
+            : Theme.of(context).dialogTheme.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
           side: isCyberpunk
@@ -337,7 +337,7 @@ class ChatSidebar extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: isCyberpunk
             ? AppTheme.cardDark
-            : Theme.of(context).dialogBackgroundColor,
+            : Theme.of(context).dialogTheme.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(isCyberpunk ? 8 : 16),
           side: isCyberpunk

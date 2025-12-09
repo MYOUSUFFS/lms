@@ -11,7 +11,7 @@ class SettingsProvider extends ChangeNotifier {
   String _apiKey = '';
   String _baseUrl = 'http://localhost:8000';
   bool _useStreaming = true; // Enabled by default for real-time streaming
-  bool _useRag = false;
+  bool _useRag = true; // Enabled by default
   ColorThemeOption _colorTheme = ColorThemes.defaultTheme;
   ThemeStyle _themeStyle = ThemeStyle.classic;
 

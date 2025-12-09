@@ -106,76 +106,78 @@ class _ChatInputState extends State<ChatInput> {
                         }
                         return KeyEventResult.ignored;
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isCyberpunk
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        maxLines: 5,
+                        minLines: 1,
+                        textInputAction: TextInputAction.newline,
+                        keyboardType: TextInputType.multiline,
+                        style: isCyberpunk
+                            ? GoogleFonts.rajdhani(
+                                color: AppTheme.textPrimaryDark,
+                                fontSize: 15,
+                              )
+                            : TextStyle(
+                                color: theme.textTheme.bodyLarge?.color,
+                                fontSize: 15,
+                              ),
+                        cursorColor: isCyberpunk
+                            ? AppTheme.primaryColor
+                            : accentColor,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: isCyberpunk
                               ? AppTheme.backgroundDark
                               : theme.inputDecorationTheme.fillColor ??
                                     Colors.grey[100],
-                          borderRadius: BorderRadius.circular(
-                            isCyberpunk ? 4 : 12,
-                          ),
-                          border: Border.all(
-                            color: _focusNode.hasFocus
-                                ? (isCyberpunk
-                                      ? AppTheme.primaryColor
-                                      : accentColor)
-                                : (isCyberpunk
-                                      ? AppTheme.primaryColor.withValues(
-                                          alpha: 0.3,
-                                        )
-                                      : Colors.grey[300]!),
-                            width: _focusNode.hasFocus ? 2 : 1,
-                          ),
-                          boxShadow: _focusNode.hasFocus && isCyberpunk
-                              ? [
-                                  BoxShadow(
-                                    color: AppTheme.primaryColor.withValues(
-                                      alpha: 0.2,
-                                    ),
-                                    blurRadius: 8,
-                                    spreadRadius: 0,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: TextField(
-                          controller: _controller,
-                          focusNode: _focusNode,
-                          maxLines: 5,
-                          minLines: 1,
-                          textInputAction: TextInputAction.newline,
-                          keyboardType: TextInputType.multiline,
-                          style: isCyberpunk
+                          hintText: isCyberpunk
+                              ? 'ENTER QUERY...'
+                              : 'Type your message...',
+                          hintStyle: isCyberpunk
                               ? GoogleFonts.rajdhani(
-                                  color: AppTheme.textPrimaryDark,
-                                  fontSize: 15,
+                                  color: AppTheme.textSecondaryDark.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  letterSpacing: 1,
                                 )
-                              : TextStyle(
-                                  color: theme.textTheme.bodyLarge?.color,
-                                  fontSize: 15,
-                                ),
-                          cursorColor: isCyberpunk
-                              ? AppTheme.primaryColor
-                              : accentColor,
-                          decoration: InputDecoration(
-                            hintText: isCyberpunk
-                                ? 'ENTER QUERY...'
-                                : 'Type your message...',
-                            hintStyle: isCyberpunk
-                                ? GoogleFonts.rajdhani(
-                                    color: AppTheme.textSecondaryDark
-                                        .withValues(alpha: 0.5),
-                                    letterSpacing: 1,
-                                  )
-                                : TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                              : TextStyle(color: Colors.grey[500]),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              isCyberpunk ? 4 : 12,
                             ),
+                            borderSide: BorderSide(
+                              color: isCyberpunk
+                                  ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                                  : Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              isCyberpunk ? 4 : 12,
+                            ),
+                            borderSide: BorderSide(
+                              color: isCyberpunk
+                                  ? AppTheme.primaryColor
+                                  : accentColor,
+                              width: 2,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              isCyberpunk ? 4 : 12,
+                            ),
+                            borderSide: BorderSide(
+                              color: isCyberpunk
+                                  ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                                  : Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
                         ),
                       ),
