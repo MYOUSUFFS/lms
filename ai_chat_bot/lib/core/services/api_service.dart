@@ -30,9 +30,11 @@ class ApiService {
   /// Check API health
   Future<bool> checkHealth() async {
     try {
+      final url = '$_apiBase/health';
       final response = await http
-          .get(Uri.parse(ApiConstants.healthEndpoint))
+          .get(Uri.parse(url))
           .timeout(const Duration(seconds: 10));
+
       return response.statusCode == 200;
     } catch (e) {
       return false;
