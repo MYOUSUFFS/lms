@@ -5,8 +5,10 @@ import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/cyberpunk_widgets.dart';
+import '../../../core/theme/providers/theme_provider.dart';
 import '../../../core/models/color_theme.dart';
 import '../../../core/models/theme_style.dart';
+import '../../theme_selection/widgets/theme_selection_drawer.dart';
 
 class SettingsDrawer extends StatefulWidget {
   const SettingsDrawer({super.key});
@@ -89,12 +91,23 @@ class _SettingsDrawerState extends State<SettingsDrawer>
 
                   const SizedBox(height: 24),
 
-                  // Theme Style Section
+                  // New Theme System
+                  _buildSectionCard(
+                    theme,
+                    isDark,
+                    icon: Icons.palette_outlined,
+                    title: isCyberpunk ? 'THEME SELECTION' : 'Theme Selection',
+                    child: _buildNewThemeSelectionButton(theme, isDark),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Theme Style Section (Legacy)
                   _buildSectionCard(
                     theme,
                     isDark,
                     icon: Icons.style_outlined,
-                    title: isCyberpunk ? 'THEME STYLE' : 'Theme Style',
+                    title: isCyberpunk ? 'THEME STYLE' : 'Theme Style (Legacy)',
                     child: _buildThemeStyleSelector(theme, settings, isDark),
                   ),
 
@@ -1017,6 +1030,75 @@ class _SettingsDrawerState extends State<SettingsDrawer>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildNewThemeSelectionButton(ThemeData theme, bool isDark) {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final currentTheme = themeProvider.currentTheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: AppTheme.isCyberpunk
+                ? AppTheme.primaryColor.withValues(alpha: 0.1)
+                : theme.colorScheme.surfaceVariant.withValues(alpha: 0.3),
+          ),
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.isCyberpunk
+                    ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                    : theme.colorScheme.primary.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.palette,
+                color: AppTheme.isCyberpunk
+                    ? AppTheme.primaryColor
+                    : theme.colorScheme.primary,
+                size: 20,
+              ),
+            ),
+            title: Text(
+              currentTheme?.name ?? 'Select Theme',
+              style: AppTheme.getBodyTextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppTheme.themeTextPrimary,
+              ),
+            ),
+            subtitle: Text(
+              currentTheme?.description ??
+                  'Choose from modern, notion, and cyberpunk themes',
+              style: AppTheme.getBodyTextStyle(
+                fontSize: 12,
+                color: AppTheme.themeTextSecondary,
+              ),
+            ),
+            trailing: Icon(
+              Icons.arrow_forward_ios,
+              color: AppTheme.themeTextSecondary,
+              size: 16,
+            ),
+            onTap: () {
+              Navigator.of(context, rootNavigator: true).push(
+                PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (context, _, __) => Dialog(
+                    child: SizedBox(
+                      width: 400,
+                      height: 600,
+                      child: const ThemeSelectionDrawer(isInDialog: true),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

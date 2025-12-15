@@ -1,6 +1,6 @@
 name: ai_chat_bot
 description: "AI Chat Bot - LMS RAG Assistant"
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0
 
 environment:
@@ -9,29 +9,29 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # State Management
   provider: ^6.1.2
-  
+
   # HTTP & Networking
   http: ^1.2.2
   http_parser: ^4.0.2
-  
+
   # Utilities
   uuid: ^4.4.2
   intl: ^0.19.0
-  
+
   # Local Storage
   shared_preferences: ^2.3.2
-  
+
   # UI Components
   flutter_markdown: ^0.7.4
   google_fonts: ^6.2.1
-  
+
   # File Picker
   file_picker: ^8.1.2
   mime: ^2.0.0
-  
+
   # PDF Viewer
   syncfusion_flutter_pdfviewer: ^27.1.58
 
@@ -40,9 +40,12 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+dependency_overrides:
+  device_info_plus: ^12.0.0
+
 flutter:
   uses-material-design: true
-  
+
   fonts:
     - family: Inter
       fonts:

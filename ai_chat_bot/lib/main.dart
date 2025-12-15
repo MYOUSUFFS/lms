@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/providers/theme_provider.dart';
+import 'core/theme/repositories/theme_repository.dart';
+import 'core/theme/widgets/cyberpunk_app_wrapper.dart';
 import 'core/services/api_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/providers/settings_provider.dart';
@@ -19,6 +22,9 @@ void main() async {
   final storageService = StorageService();
   await storageService.init();
 
+  // Initialize theme repository with predefined themes
+  ThemeRepository.initialize();
+
   // Load saved settings
   final apiKey = await storageService.getApiKey();
   final baseUrl = await storageService.getBaseUrl();
@@ -30,6 +36,10 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(storageService)..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              ThemeProvider(ThemeRepository(storageService))..initialize(),
         ),
         ChangeNotifierProvider(
           create: (_) => ChatProvider(apiService, storageService)..init(),
@@ -48,23 +58,39 @@ class AIChatBotApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsProvider>();
+    return Consumer2<SettingsProvider, ThemeProvider>(
+      builder: (context, settings, themeProvider, _) {
+        // Use new theme system if initialized, otherwise fall back to old system
+        if (themeProvider.isInitialized && themeProvider.currentTheme != null) {
+          return MaterialApp(
+            key: ValueKey(
+              '${themeProvider.currentTheme?.id}_${themeProvider.themeMode.name}',
+            ),
+            title: 'LMS AI Assistant',
+            debugShowCheckedModeBanner: false,
+            theme: themeProvider.lightTheme,
+            darkTheme: themeProvider.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: CyberpunkApp(child: const LearningAssistantScreen()),
+          );
+        }
 
-    // Determine current brightness based on theme mode
-    final brightness = _getBrightness(context, settings.themeMode);
+        // Fallback to old theme system during initialization
+        final brightness = _getBrightness(context, settings.themeMode);
+        AppTheme.setBrightness(brightness);
 
-    // Update AppTheme with current brightness
-    AppTheme.setBrightness(brightness);
-
-    return MaterialApp(
-      // Use both color theme id and style as key to force rebuild when either changes
-      key: ValueKey('${settings.colorTheme.id}_${settings.themeStyle.name}'),
-      title: 'LMS AI Assistant',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: settings.themeMode,
-      home: const LearningAssistantScreen(),
+        return MaterialApp(
+          key: ValueKey(
+            'fallback_${settings.colorTheme.id}_${settings.themeStyle.name}',
+          ),
+          title: 'LMS AI Assistant',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: settings.themeMode,
+          home: const LearningAssistantScreen(),
+        );
+      },
     );
   }
 

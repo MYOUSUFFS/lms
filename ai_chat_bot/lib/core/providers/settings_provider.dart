@@ -29,7 +29,7 @@ class SettingsProvider extends ChangeNotifier {
     await _storage.init();
 
     final themeModeStr = await _storage.getThemeMode();
-    _themeMode = _parseThemeMode(themeModeStr);
+    _themeMode = _parseThemeMode(themeModeStr ?? 'system');
 
     _apiKey = await _storage.getApiKey() ?? '';
     _baseUrl = await _storage.getBaseUrl() ?? 'http://localhost:8000';

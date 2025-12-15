@@ -1,8 +1,10 @@
+import 'dart:io' show Platform, File, Process;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../core/models/document.dart';
 import '../../../core/providers/document_provider.dart';
 import '../../../core/theme/app_theme.dart';
@@ -208,6 +210,51 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   }
 
   Widget _buildPdfViewer() {
+    // On Linux desktop, the syncfusion PDF viewer has issues with device_info_plus
+    // Show a fallback message with option to open externally
+    if (!kIsWeb && Platform.isLinux) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.picture_as_pdf, 
+                   size: 80, 
+                   color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 24),
+              Text(
+                'PDF Viewer',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'PDF viewing in the app is currently not supported on Linux desktop.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please use an external PDF viewer or view on another platform.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: _downloadDocument,
+                icon: const Icon(Icons.download),
+                label: const Text('Download PDF'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
     return SfPdfViewer.memory(
       Uint8List.fromList(_documentBytes!),
       enableDoubleTapZooming: true,
@@ -492,18 +539,80 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   }
 
   Future<void> _downloadDocument() async {
-    if (kIsWeb) {
-      // On web, trigger download
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Download started...')));
-      // Implement web download logic
-    } else {
-      // On mobile/desktop, save to file
+    if (_documentBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Download feature coming soon')),
+        const SnackBar(content: Text('No document to download')),
       );
-      // Implement native download logic using file_picker or path_provider
+      return;
+    }
+
+    try {
+      if (kIsWeb) {
+        // On web, trigger download using anchor element
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Download started...')),
+        );
+        // Web download would require html package
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Web download not yet implemented')),
+        );
+      } else {
+        // On desktop/mobile, let user choose save location
+        String? outputPath = await FilePicker.platform.saveFile(
+          dialogTitle: 'Save Document',
+          fileName: widget.document.filename,
+          type: FileType.any,
+        );
+
+        if (outputPath != null) {
+          // Write file to selected location
+          final file = File(outputPath);
+          await file.writeAsBytes(_documentBytes!);
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Document saved to: $outputPath'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'Open Folder',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    // Open file location
+                    _openFileLocation(outputPath);
+                  },
+                ),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save document: ${e.toString()}'),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _openFileLocation(String filePath) async {
+    try {
+      final directory = File(filePath).parent.path;
+      
+      if (Platform.isLinux) {
+        await Process.run('xdg-open', [directory]);
+      } else if (Platform.isWindows) {
+        await Process.run('explorer', [directory]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [directory]);
+      }
+    } catch (e) {
+      debugPrint('Failed to open file location: $e');
     }
   }
 }
