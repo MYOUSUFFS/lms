@@ -219,9 +219,11 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.picture_as_pdf, 
-                   size: 80, 
-                   color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.picture_as_pdf,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(height: 24),
               Text(
                 'PDF Viewer',
@@ -240,7 +242,9 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
                 'Please use an external PDF viewer or view on another platform.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 32),
@@ -254,7 +258,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
         ),
       );
     }
-    
+
     return SfPdfViewer.memory(
       Uint8List.fromList(_documentBytes!),
       enableDoubleTapZooming: true,
@@ -540,18 +544,18 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
 
   Future<void> _downloadDocument() async {
     if (_documentBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No document to download')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No document to download')));
       return;
     }
 
     try {
       if (kIsWeb) {
         // On web, trigger download using anchor element
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Download started...')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Download started...')));
         // Web download would require html package
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Web download not yet implemented')),
@@ -568,7 +572,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
           // Write file to selected location
           final file = File(outputPath);
           await file.writeAsBytes(_documentBytes!);
-          
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -603,7 +607,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   Future<void> _openFileLocation(String filePath) async {
     try {
       final directory = File(filePath).parent.path;
-      
+
       if (Platform.isLinux) {
         await Process.run('xdg-open', [directory]);
       } else if (Platform.isWindows) {

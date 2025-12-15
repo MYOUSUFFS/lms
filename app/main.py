@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.api import api_router
+from app.api import api_router, api_v2_router
 
 
 @asynccontextmanager
@@ -22,6 +22,15 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.app_env}")
     logger.info(f"Debug: {settings.debug}")
     
+    # Initialize Redis connection
+    try:
+        from app.core.redis import get_redis
+        await get_redis()
+        logger.info("Redis connection initialized")
+    except Exception as e:
+        logger.warning(f"Redis initialization failed: {e}")
+        logger.warning("Token blacklist will not work, but app will continue")
+    
     # Pre-load models if needed (optional, can be lazy)
     # This is commented out to allow faster startup
     # from app.services.rag import get_embeddings_service
@@ -31,6 +40,14 @@ async def lifespan(app: FastAPI):
     
     # Shutdown
     logger.info("Shutting down application")
+    
+    # Close Redis connection
+    try:
+        from app.core.redis import close_redis
+        await close_redis()
+        logger.info("Redis connection closed")
+    except Exception as e:
+        logger.error(f"Error closing Redis: {e}")
 
 
 def create_app() -> FastAPI:
@@ -80,6 +97,7 @@ All endpoints (except health check) require an API key in the `X-API-Key` header
     
     # Include API routes
     app.include_router(api_router, prefix="/api/v1")
+    app.include_router(api_v2_router)  # v2 routes include their own /api/v2 prefix
     
     return app
 

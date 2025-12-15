@@ -1,0 +1,16 @@
+
+module my-nginx 1.0;
+
+require {
+	type proc_t;
+	type container_t;
+	type user_home_t;
+	type unlabeled_t;
+	class file { open read };
+	class filesystem associate;
+}
+
+#============= container_t ==============
+allow container_t proc_t:filesystem associate;
+allow container_t unlabeled_t:file read;
+allow container_t user_home_t:file { open read };

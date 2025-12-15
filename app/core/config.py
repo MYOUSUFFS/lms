@@ -27,9 +27,31 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
     
-    # API Key Authentication
+    # API Key Authentication (Legacy - will be deprecated)
     api_key: str = "change-me-in-production"
     api_key_header: str = "X-API-Key"
+    
+    # Database
+    database_url: str = "postgresql+asyncpg://lms_user:lms_password@localhost:5432/lms_db"
+    database_echo: bool = False
+    
+    # Redis
+    redis_url: str = "redis://localhost:6379/0"
+    redis_password: str = ""
+    
+    # JWT Authentication
+    jwt_secret: str = "change-me-in-production-use-strong-random-key"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
+    
+    # Email Configuration
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = "noreply@lms.com"
+    smtp_from_name: str = "LMS Platform"
     
     # Ollama (Local LLM - Primary)
     ollama_base_url: str = "http://localhost:11434"

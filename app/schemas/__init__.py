@@ -9,6 +9,51 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
+# Import user schemas
+from app.schemas.user import (
+    UserBase,
+    UserCreate,
+    UserUpdate,
+    UserResponse,
+    UserLogin,
+    TokenResponse,
+    TokenRefresh,
+    PasswordReset,
+    PasswordResetRequest,
+    EmailVerification,
+)
+
+# Import classroom schemas
+from app.schemas.classroom import (
+    ClassroomBase,
+    ClassroomCreate,
+    ClassroomUpdate,
+    ClassroomResponse,
+    ClassroomMemberBase,
+    ClassroomMemberCreate,
+    ClassroomMemberUpdate,
+    ClassroomMemberResponse,
+)
+
+# Import organization schemas
+from app.schemas.organization import (
+    OrganizationBase,
+    OrganizationCreate,
+    OrganizationUpdate,
+    OrganizationResponse,
+    OrganizationMemberBase,
+    OrganizationMemberCreate,
+    OrganizationMemberUpdate,
+    OrganizationMemberResponse,
+    InvitationBase,
+    InvitationCreate,
+    InvitationResponse,
+    InvitationAccept,
+    ParentStudentLinkBase,
+    ParentStudentLinkCreate,
+    ParentStudentLinkResponse,
+)
+
 
 # ===========================================
 # Enums

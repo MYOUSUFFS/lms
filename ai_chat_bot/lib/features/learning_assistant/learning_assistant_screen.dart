@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/providers/auth_provider.dart';
 import '../../core/providers/chat_provider.dart';
 import '../../core/providers/document_provider.dart';
 import '../../core/providers/settings_provider.dart';
@@ -146,8 +147,7 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
 
               // Main content area - Chat or Welcome/Upload prompt
               Expanded(
-                child:
-                    chatProvider.hasConversation &&
+                child: chatProvider.hasConversation &&
                         chatProvider.currentMessages.isNotEmpty
                     ? const MessageList()
                     : _buildWelcomeWithUpload(context, documentProvider),
@@ -190,9 +190,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     final settingsProvider = context.watch<SettingsProvider>();
     final isCyberpunk = AppTheme.isCyberpunk;
     final theme = Theme.of(context);
-    final accentColor = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final accentColor =
+        isCyberpunk ? AppTheme.primaryColor : const Color(0xFF6366F1);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -338,15 +337,14 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
             onPressed: () => settingsProvider.toggleRag(),
             tooltip: settingsProvider.useRag
                 ? (isCyberpunk
-                      ? 'RAG ENABLED - USING DOCUMENTS'
-                      : 'RAG Enabled - Using Documents')
+                    ? 'RAG ENABLED - USING DOCUMENTS'
+                    : 'RAG Enabled - Using Documents')
                 : (isCyberpunk
-                      ? 'RAG DISABLED - CLICK TO ENABLE'
-                      : 'RAG Disabled - Click to Enable'),
+                    ? 'RAG DISABLED - CLICK TO ENABLE'
+                    : 'RAG Disabled - Click to Enable'),
             isActive: settingsProvider.useRag,
-            activeColor: isCyberpunk
-                ? AppTheme.neonPurple
-                : const Color(0xFF8B5CF6),
+            activeColor:
+                isCyberpunk ? AppTheme.neonPurple : const Color(0xFF8B5CF6),
           ),
 
           // New chat button
@@ -383,6 +381,38 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
               tooltip: 'Documents',
             ),
 
+          // Organizations button
+          _buildCyberpunkIconButton(
+            icon: Icons.business_outlined,
+            onPressed: () => Navigator.pushNamed(context, '/organizations'),
+            tooltip: isCyberpunk ? 'ORGANIZATIONS' : 'Organizations',
+            activeColor: const Color(0xFF10B981),
+          ),
+
+          // Classrooms button
+          _buildCyberpunkIconButton(
+            icon: Icons.class_outlined,
+            onPressed: () => Navigator.pushNamed(context, '/classrooms'),
+            tooltip: isCyberpunk ? 'CLASSROOMS' : 'Classrooms',
+            activeColor: const Color(0xFF3B82F6),
+          ),
+
+          // Home/Dashboard button
+          _buildCyberpunkIconButton(
+            icon: Icons.dashboard_outlined,
+            onPressed: () => Navigator.pushNamed(context, '/home'),
+            tooltip: isCyberpunk ? 'DASHBOARD' : 'Dashboard',
+            activeColor: const Color(0xFFEF4444),
+          ),
+
+          // Logout button
+          _buildCyberpunkIconButton(
+            icon: Icons.logout,
+            onPressed: () => _handleLogout(context),
+            tooltip: isCyberpunk ? 'LOGOUT' : 'Logout',
+            activeColor: Colors.red,
+          ),
+
           // Settings button (mobile)
           if (!isWideScreen && !isMediumScreen)
             _buildCyberpunkIconButton(
@@ -395,6 +425,39 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     );
   }
 
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.logout();
+      
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      }
+    }
+  }
+
   Widget _buildCyberpunkIconButton({
     required IconData icon,
     required VoidCallback onPressed,
@@ -403,9 +466,8 @@ class _LearningAssistantScreenState extends State<LearningAssistantScreen> {
     Color? activeColor,
   }) {
     final isCyberpunk = AppTheme.isCyberpunk;
-    final defaultColor = isCyberpunk
-        ? AppTheme.primaryColor
-        : const Color(0xFF6366F1);
+    final defaultColor =
+        isCyberpunk ? AppTheme.primaryColor : const Color(0xFF6366F1);
     final color = isActive
         ? (activeColor ?? defaultColor)
         : (isCyberpunk ? AppTheme.textSecondaryDark : Colors.grey[600]!);
