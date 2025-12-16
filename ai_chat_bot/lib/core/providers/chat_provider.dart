@@ -13,16 +13,71 @@ class ChatProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isConnected = false;
   String _streamingContent = '';
+  String? _currentClassroomId; // Add classroom context
 
   ChatProvider(this._apiService, this._storageService);
 
   List<Conversation> get conversations => _conversations;
+  
+  // Get filtered conversations for current classroom context
+  List<Conversation> get filteredConversations {
+    if (_currentClassroomId == null) {
+      // If no classroom context, show ALL conversations
+      return _conversations;
+    }
+    // Show only conversations for current classroom
+    return _conversations.where((c) => c.metadata?['classroomId'] == _currentClassroomId).toList();
+  }
+  
   Conversation? get currentConversation => _currentConversation;
   List<Message> get currentMessages => _currentConversation?.messages ?? [];
+  List<Message> get messages => currentMessages; // Add messages getter
   bool get isLoading => _isLoading;
   bool get isConnected => _isConnected;
   String get streamingContent => _streamingContent;
   bool get hasConversation => _currentConversation != null;
+  String? get currentClassroomId => _currentClassroomId;
+  bool get isClassroomContext => _currentClassroomId != null;
+
+  // Set classroom context for chat
+  void setClassroomContext(String classroomId) {
+    _currentClassroomId = classroomId;
+    _loadClassroomConversation(classroomId);
+  }
+
+  // Clear classroom context (when leaving classroom)
+  void clearClassroomContext() {
+    _currentClassroomId = null;
+    _currentConversation = null;
+    notifyListeners();
+  }
+
+  // Load chat history for specific classroom
+  Future<void> loadChatHistory(String classroomId) async {
+    _currentClassroomId = classroomId;
+    await _loadClassroomConversation(classroomId);
+  }
+
+  // Load or create conversation for classroom
+  Future<void> _loadClassroomConversation(String classroomId) async {
+    // Find existing conversation for this classroom
+    final existingConversation = _conversations.firstWhere(
+      (c) => c.metadata?['classroomId'] == classroomId,
+      orElse: () {
+        // Create new conversation for this classroom
+        final newConversation = Conversation(
+          title: 'Classroom Chat',
+          useRag: true,
+          metadata: {'classroomId': classroomId},
+        );
+        _conversations.add(newConversation);
+        return newConversation;
+      },
+    );
+
+    _currentConversation = existingConversation;
+    notifyListeners();
+  }
 
   Future<void> init() async {
     _conversations = await _storageService.loadConversations();
@@ -42,7 +97,18 @@ class ChatProvider extends ChangeNotifier {
 
   // Conversation Management
   void createNewConversation({bool useRag = false}) {
-    _currentConversation = Conversation(title: 'New Chat', useRag: useRag);
+    // If in classroom context, create conversation with classroom metadata
+    if (_currentClassroomId != null) {
+      final newConversation = Conversation(
+        title: 'Classroom Chat',
+        useRag: useRag,
+        metadata: {'classroomId': _currentClassroomId},
+      );
+      _conversations.add(newConversation);
+      _currentConversation = newConversation;
+    } else {
+      _currentConversation = Conversation(title: 'New Chat', useRag: useRag);
+    }
     notifyListeners();
   }
 
@@ -72,7 +138,11 @@ class ChatProvider extends ChangeNotifier {
   }
 
   // Message Handling
-  Future<void> sendMessage(String content, {bool useRag = false}) async {
+  Future<void> sendMessage(
+    String content, {
+    bool useRag = false,
+    List<String>? documentIds,
+  }) async {
     if (content.trim().isEmpty) return;
     if (_currentConversation == null) {
       createNewConversation(useRag: useRag);
@@ -93,7 +163,10 @@ class ChatProvider extends ChangeNotifier {
       Message response;
 
       if (useRag) {
-        response = await _apiService.sendRagQuery(query: content);
+        response = await _apiService.sendRagQuery(
+          query: content,
+          documentIds: documentIds,
+        );
       } else {
         // Build conversation history for context
         final history = _buildConversationHistory();
@@ -126,6 +199,7 @@ class ChatProvider extends ChangeNotifier {
   Future<void> sendMessageStreaming(
     String content, {
     bool useRag = false,
+    List<String>? documentIds,
   }) async {
     if (content.trim().isEmpty) return;
     if (_currentConversation == null) {
@@ -148,7 +222,10 @@ class ChatProvider extends ChangeNotifier {
       Stream<String> stream;
 
       if (useRag) {
-        stream = _apiService.streamRagQuery(query: content);
+        stream = _apiService.streamRagQuery(
+          query: content,
+          documentIds: documentIds,
+        );
       } else {
         final history = _buildConversationHistory();
         stream = _apiService.streamChatMessage(
@@ -187,6 +264,16 @@ class ChatProvider extends ChangeNotifier {
       _streamingContent = '';
       notifyListeners();
     }
+  }
+
+  /// Get document IDs for current classroom
+  Future<List<String>?> _getClassroomDocumentIds() async {
+    if (_currentClassroomId == null) return null;
+    
+    // We need access to DocumentProvider to get the documents
+    // For now, return null and we'll inject DocumentProvider
+    // This will be handled when we import and use Provider.of in the method
+    return null;
   }
 
   List<Map<String, String>> _buildConversationHistory() {

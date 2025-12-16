@@ -100,6 +100,7 @@ class DocumentInfo(BaseModel):
     chunks_count: int
     created_at: datetime
     file_size_bytes: Optional[int] = None
+    classroom_id: Optional[str] = Field(None, description="Associated classroom ID")
     
 
 class DocumentListResponse(BaseModel):

@@ -8,6 +8,7 @@ class Conversation {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool useRag;
+  final Map<String, dynamic>? metadata; // Add metadata field
 
   Conversation({
     String? id,
@@ -16,6 +17,7 @@ class Conversation {
     DateTime? createdAt,
     DateTime? updatedAt,
     this.useRag = false,
+    this.metadata,
   }) : id = id ?? const Uuid().v4(),
        messages = messages ?? [],
        createdAt = createdAt ?? DateTime.now(),
@@ -28,6 +30,7 @@ class Conversation {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? useRag,
+    Map<String, dynamic>? metadata,
   }) {
     return Conversation(
       id: id ?? this.id,
@@ -36,6 +39,7 @@ class Conversation {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       useRag: useRag ?? this.useRag,
+      metadata: metadata ?? this.metadata,
     );
   }
 
@@ -47,6 +51,7 @@ class Conversation {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'useRag': useRag,
+      'metadata': metadata,
     };
   }
 
@@ -60,6 +65,7 @@ class Conversation {
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       useRag: json['useRag'] as bool? ?? false,
+      metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
 

@@ -101,10 +101,12 @@ class VectorStore:
             ids.append(chunk_id)
             texts.append(chunk.content)
             
+            # Build metadata from document metadata (includes classroom_id) and chunk metadata
             metadata = {
                 "document_id": document.document_id,
                 "filename": document.filename,
                 "chunk_index": chunk.chunk_index,
+                **{k: str(v) for k, v in document.metadata.items() if v is not None and k not in ["document_id", "filename"]},
                 **{k: str(v) for k, v in chunk.metadata.items() if v is not None},
             }
             if chunk.page_number:
@@ -249,13 +251,19 @@ class VectorStore:
         if results and results["metadatas"]:
             for metadata in results["metadatas"]:
                 doc_id = metadata.get("document_id")
-                if doc_id and doc_id not in documents:
-                    documents[doc_id] = {
-                        "document_id": doc_id,
-                        "filename": metadata.get("filename", "unknown"),
-                        "chunks_count": 0,
-                    }
                 if doc_id:
+                    if doc_id not in documents:
+                        documents[doc_id] = {
+                            "document_id": doc_id,
+                            "filename": metadata.get("filename", "unknown"),
+                            "classroom_id": metadata.get("classroom_id"),
+                            "chunks_count": 0,
+                        }
+                    else:
+                        # Update classroom_id if this chunk has it and document doesn't
+                        if metadata.get("classroom_id") and not documents[doc_id].get("classroom_id"):
+                            documents[doc_id]["classroom_id"] = metadata.get("classroom_id")
+                    
                     documents[doc_id]["chunks_count"] += 1
         
         return list(documents.values())

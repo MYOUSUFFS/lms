@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/providers/organization_provider.dart';
+import '../../core/providers/classroom_provider.dart';
 import 'login_screen.dart';
 
 /// Splash screen that initializes auth state
@@ -36,7 +39,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Navigate based on auth state
     if (authProvider.isAuthenticated) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Initialize organization and classroom providers with token
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      
+      if (token != null && mounted) {
+        Provider.of<OrganizationProvider>(context, listen: false).setToken(token);
+        Provider.of<ClassroomProvider>(context, listen: false).setToken(token);
+      }
+      
+      // Navigate to Classrooms screen (home)
+      Navigator.of(context).pushReplacementNamed('/classrooms');
     } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginScreen()),

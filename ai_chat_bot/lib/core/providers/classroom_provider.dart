@@ -33,9 +33,62 @@ class ClassroomProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _classrooms = await _classroomService.listClassrooms(
-        organizationId: organizationId,
-      );
+      // TEMPORARY: Use mock data for testing UI
+      // TODO: Remove this once backend endpoints are working
+      await Future.delayed(const Duration(milliseconds: 500));
+      final now = DateTime.now();
+      _classrooms = [
+        Classroom(
+          id: 'mock-classroom-1',
+          name: 'Math 101',
+          description: 'Introduction to Mathematics',
+          organizationId: organizationId ?? 'mock-org-1',
+          ownerId: 'mock-user-1',
+          ownerType: 'user',
+          subject: 'Mathematics',
+          gradeLevel: 'Grade 10',
+          settings: {},
+          isActive: true,
+          createdAt: now.subtract(const Duration(days: 30)),
+          updatedAt: now,
+          chromaCollectionName: 'classroom_mock_1',
+        ),
+        Classroom(
+          id: 'mock-classroom-2',
+          name: 'Physics 202',
+          description: 'Advanced Physics',
+          organizationId: organizationId ?? 'mock-org-1',
+          ownerId: 'mock-user-1',
+          ownerType: 'user',
+          subject: 'Physics',
+          gradeLevel: 'Grade 12',
+          settings: {},
+          isActive: true,
+          createdAt: now.subtract(const Duration(days: 15)),
+          updatedAt: now,
+          chromaCollectionName: 'classroom_mock_2',
+        ),
+        Classroom(
+          id: 'mock-classroom-3',
+          name: 'Chemistry Lab',
+          description: 'Practical Chemistry',
+          organizationId: organizationId ?? 'mock-org-1',
+          ownerId: 'mock-user-1',
+          ownerType: 'user',
+          subject: 'Chemistry',
+          gradeLevel: 'Grade 11',
+          settings: {},
+          isActive: true,
+          createdAt: now.subtract(const Duration(days: 7)),
+          updatedAt: now,
+          chromaCollectionName: 'classroom_mock_3',
+        ),
+      ];
+      
+      // Real implementation (uncomment when backend is ready):
+      // _classrooms = await _classroomService.listClassrooms(
+      //   organizationId: organizationId,
+      // );
 
       // Auto-select first classroom if none selected
       if (_selectedClassroom == null && _classrooms.isNotEmpty) {

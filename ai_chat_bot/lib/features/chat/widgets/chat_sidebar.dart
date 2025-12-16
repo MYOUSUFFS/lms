@@ -137,13 +137,13 @@ class ChatSidebar extends StatelessWidget {
 
           // Conversations list
           Expanded(
-            child: chatProvider.conversations.isEmpty
+            child: chatProvider.filteredConversations.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: chatProvider.conversations.length,
+                    itemCount: chatProvider.filteredConversations.length,
                     itemBuilder: (context, index) {
-                      final conversation = chatProvider.conversations[index];
+                      final conversation = chatProvider.filteredConversations[index];
                       final isSelected =
                           chatProvider.currentConversation?.id ==
                           conversation.id;

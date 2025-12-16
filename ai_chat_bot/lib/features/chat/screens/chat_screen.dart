@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/chat_provider.dart';
+import '../../../core/providers/document_provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../widgets/chat_sidebar.dart';
 import '../widgets/message_list.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/settings_drawer.dart';
+import '../../documents/widgets/documents_panel.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -18,10 +20,12 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _showSidebar = true;
+  bool _showDocuments = true;
 
   @override
   Widget build(BuildContext context) {
     final chatProvider = context.watch<ChatProvider>();
+    final documentProvider = context.watch<DocumentProvider>();
     final settingsProvider = context.watch<SettingsProvider>();
     final isWideScreen = MediaQuery.of(context).size.width > 768;
 
@@ -68,15 +72,22 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (chatProvider.hasConversation)
                   ChatInput(
                     onSend: (message) {
+                      // Get classroom document IDs for filtering
+                      final documentIds = chatProvider.isClassroomContext && settingsProvider.useRag
+                          ? documentProvider.documents.map((d) => d.documentId).toList()
+                          : null;
+                      
                       if (settingsProvider.useStreaming) {
                         chatProvider.sendMessageStreaming(
                           message,
                           useRag: settingsProvider.useRag,
+                          documentIds: documentIds,
                         );
                       } else {
                         chatProvider.sendMessage(
                           message,
                           useRag: settingsProvider.useRag,
+                          documentIds: documentIds,
                         );
                       }
                     },
@@ -85,6 +96,13 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
+
+          // Documents panel (right side)
+          if (isWideScreen && _showDocuments)
+            const SizedBox(
+              width: 320,
+              child: DocumentsPanel(),
+            ),
         ],
       ),
       // Mobile drawer
@@ -419,13 +437,25 @@ class _ChatScreenState extends State<ChatScreen> {
       label: Text(prompt),
       onPressed: () {
         chatProvider.createNewConversation(useRag: settingsProvider.useRag);
+        
+        // Get classroom document IDs for filtering
+        final documentProvider = context.read<DocumentProvider>();
+        final documentIds = chatProvider.isClassroomContext && settingsProvider.useRag
+            ? documentProvider.documents.map((d) => d.documentId).toList()
+            : null;
+        
         if (settingsProvider.useStreaming) {
           chatProvider.sendMessageStreaming(
             prompt,
             useRag: settingsProvider.useRag,
+            documentIds: documentIds,
           );
         } else {
-          chatProvider.sendMessage(prompt, useRag: settingsProvider.useRag);
+          chatProvider.sendMessage(
+            prompt,
+            useRag: settingsProvider.useRag,
+            documentIds: documentIds,
+          );
         }
       },
     );

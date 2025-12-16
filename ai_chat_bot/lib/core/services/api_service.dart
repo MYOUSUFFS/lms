@@ -65,8 +65,9 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final content = (data['answer'] ?? data['response'])?.toString() ?? 'No response received';
         return Message(
-          content: (data['answer'] ?? data['response']) as String,
+          content: content,
           role: MessageRole.assistant,
           status: MessageStatus.sent,
         );
@@ -90,9 +91,18 @@ class ApiService {
   }
 
   /// Send a RAG query (with document context)
-  Future<Message> sendRagQuery({required String query, int topK = 5}) async {
+  Future<Message> sendRagQuery({
+    required String query,
+    int topK = 5,
+    List<String>? documentIds,
+  }) async {
     try {
-      final body = {'query': query, 'top_k': topK};
+      final body = {
+        'query': query,
+        'top_k': topK,
+        if (documentIds != null && documentIds.isNotEmpty)
+          'document_ids': documentIds,
+      };
 
       final response = await http
           .post(
@@ -107,9 +117,10 @@ class ApiService {
         final sources = (data['sources'] as List<dynamic>?)
             ?.map((s) => s['source'].toString())
             .toList();
-
+        
+        final content = data['response']?.toString() ?? 'No response received';
         return Message(
-          content: data['response'] as String,
+          content: content,
           role: MessageRole.assistant,
           status: MessageStatus.sent,
           sources: sources,
@@ -173,10 +184,19 @@ class ApiService {
   }
 
   /// Stream RAG query response
-  Stream<String> streamRagQuery({required String query, int topK = 5}) async* {
+  Stream<String> streamRagQuery({
+    required String query,
+    int topK = 5,
+    List<String>? documentIds,
+  }) async* {
     final client = http.Client();
     try {
-      final body = {'query': query, 'top_k': topK};
+      final body = {
+        'query': query,
+        'top_k': topK,
+        if (documentIds != null && documentIds.isNotEmpty)
+          'document_ids': documentIds,
+      };
 
       final request = http.Request('POST', Uri.parse('$_apiBase/query/stream'));
       request.headers.addAll(_headers);
@@ -224,9 +244,21 @@ class ApiService {
     required String fileName,
     required List<int> fileBytes,
     String? documentId,
+    String? classroomId,
   }) async {
     try {
-      final uri = Uri.parse('$_apiBase/documents/upload');
+      // Build URI with query parameters
+      final queryParams = <String, String>{};
+      if (documentId != null) {
+        queryParams['document_id'] = documentId;
+      }
+      if (classroomId != null) {
+        queryParams['classroom_id'] = classroomId;
+      }
+      
+      final uri = Uri.parse('$_apiBase/documents/upload').replace(
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
       final request = http.MultipartRequest('POST', uri);
 
       // Add headers
@@ -246,11 +278,6 @@ class ApiService {
         ),
       );
 
-      // Add optional document ID
-      if (documentId != null) {
-        request.fields['document_id'] = documentId;
-      }
-
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 5), // Longer timeout for file uploads
       );
@@ -267,6 +294,7 @@ class ApiService {
           status: _parseProcessingStatus(data['status']),
           message: data['message'] as String? ?? 'Upload successful',
           chunksCreated: data['chunks_created'] as int? ?? 0,
+          classroomId: data['classroom_id'] as String?,
         );
       } else {
         final error = _parseError(response);

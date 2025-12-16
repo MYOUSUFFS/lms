@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/classroom_provider.dart';
 import '../../../core/providers/organization_provider.dart';
+import '../../../core/providers/auth_provider.dart';
+import '../../../core/providers/chat_provider.dart';
 import '../../../core/models/classroom.dart';
 import 'create_classroom_screen.dart';
-import 'classroom_detail_screen.dart';
+import '../../chat/screens/chat_screen.dart';
 
 /// Screen displaying list of classrooms
 class ClassroomsScreen extends StatefulWidget {
@@ -18,20 +20,66 @@ class _ClassroomsScreenState extends State<ClassroomsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final orgProvider = context.read<OrganizationProvider>();
-      final classroomProvider = context.read<ClassroomProvider>();
-      classroomProvider.loadClassrooms(
-        organizationId: orgProvider.selectedOrganization?.id,
-      );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final orgProvider = context.read<OrganizationProvider>();
+        final classroomProvider = context.read<ClassroomProvider>();
+        
+        // Load classrooms (will be empty if no organizations exist)
+        await classroomProvider.loadClassrooms(
+          organizationId: orgProvider.selectedOrganization?.id,
+        );
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error loading classrooms: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     });
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.logout();
+
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Classrooms'),
+        title: const Text('My Classrooms'),
         actions: [
           Consumer<OrganizationProvider>(
             builder: (context, orgProvider, child) {
@@ -52,6 +100,12 @@ class _ClassroomsScreenState extends State<ClassroomsScreen> {
               return const SizedBox.shrink();
             },
           ),
+          // Organizations button
+          IconButton(
+            icon: const Icon(Icons.business),
+            tooltip: 'Organizations',
+            onPressed: () => Navigator.pushNamed(context, '/organizations'),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -59,6 +113,41 @@ class _ClassroomsScreenState extends State<ClassroomsScreen> {
               context.read<ClassroomProvider>().loadClassrooms(
                     organizationId: orgProvider.selectedOrganization?.id,
                   );
+            },
+          ),
+          // Logout button
+          PopupMenuButton(
+            icon: const Icon(Icons.account_circle),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    Icon(Icons.person, color: Theme.of(context).primaryColor),
+                    const SizedBox(width: 8),
+                    Consumer<AuthProvider>(
+                      builder: (context, auth, _) => Text(
+                        auth.currentUser?.email ?? 'Profile',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Logout', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+            onSelected: (value) {
+              if (value == 'logout') {
+                _handleLogout(context);
+              }
             },
           ),
         ],
@@ -163,13 +252,23 @@ class _ClassroomsScreenState extends State<ClassroomsScreen> {
     );
   }
 
-  void _navigateToDetail(BuildContext context, Classroom classroom) {
-    Navigator.push(
+  void _navigateToDetail(BuildContext context, Classroom classroom) async {
+    // Set classroom context for chat
+    final chatProvider = context.read<ChatProvider>();
+    chatProvider.setClassroomContext(classroom.id);
+    
+    // Navigate directly to chat screen
+    await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ClassroomDetailScreen(classroom: classroom),
+        builder: (context) => const ChatScreen(),
       ),
     );
+    
+    // Clear classroom context when returning
+    if (mounted) {
+      chatProvider.clearClassroomContext();
+    }
   }
 }
 

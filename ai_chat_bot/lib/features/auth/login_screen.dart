@@ -50,8 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<ClassroomProvider>(context, listen: false).setToken(token);
       }
 
-      // Navigation will be handled by main.dart based on auth state
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Navigate to Classrooms screen (home)
+      Navigator.of(context).pushReplacementNamed('/classrooms');
     } else if (mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

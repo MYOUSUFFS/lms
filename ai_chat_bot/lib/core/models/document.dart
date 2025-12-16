@@ -100,6 +100,10 @@ class DocumentInfo {
   final int chunksCount;
   final DateTime? createdAt;
   final String? url;
+  final String? classroomId; // Add classroom context
+
+  // Add getter for id to match usage
+  String get id => documentId;
 
   DocumentInfo({
     required this.documentId,
@@ -109,6 +113,7 @@ class DocumentInfo {
     this.chunksCount = 0,
     this.createdAt,
     this.url,
+    this.classroomId,
   });
 
   factory DocumentInfo.fromJson(Map<String, dynamic> json) {
@@ -122,6 +127,7 @@ class DocumentInfo {
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
       url: json['url'] as String?,
+      classroomId: json['classroom_id'] as String?,
     );
   }
 
@@ -134,6 +140,7 @@ class DocumentInfo {
       'chunks_count': chunksCount,
       'created_at': createdAt?.toIso8601String(),
       'url': url,
+      'classroom_id': classroomId,
     };
   }
 
@@ -182,6 +189,7 @@ class DocumentUploadResult {
   final String message;
   final int chunksCreated;
   final String? url;
+  final String? classroomId;
 
   DocumentUploadResult({
     required this.success,
@@ -192,6 +200,7 @@ class DocumentUploadResult {
     required this.message,
     this.chunksCreated = 0,
     this.url,
+    this.classroomId,
   });
 
   DocumentInfo? toDocumentInfo() {
@@ -204,6 +213,7 @@ class DocumentUploadResult {
       chunksCount: chunksCreated,
       createdAt: DateTime.now(),
       url: url,
+      classroomId: classroomId,
     );
   }
 }

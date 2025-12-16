@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/models/document.dart';
 import '../../../core/providers/document_provider.dart';
+import '../../../core/providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/cyberpunk_widgets.dart';
 import '../screens/document_viewer_screen.dart';
@@ -31,7 +32,22 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<DocumentProvider>().fetchDocuments();
+        // Get classroom context from ChatProvider
+        final chatProvider = context.read<ChatProvider>();
+        final docProvider = context.read<DocumentProvider>();
+        
+        print('=== DocumentsPanel Init ===');
+        print('Classroom ID from ChatProvider: ${chatProvider.currentClassroomId}');
+        
+        // Set classroom context if exists
+        if (chatProvider.currentClassroomId != null) {
+          docProvider.setClassroomContext(chatProvider.currentClassroomId!);
+          print('Set classroom context: ${chatProvider.currentClassroomId}');
+        } else {
+          print('No classroom context - showing all documents');
+        }
+        
+        docProvider.fetchDocuments();
       }
     });
   }
@@ -106,26 +122,35 @@ class _DocumentsPanelState extends State<DocumentsPanel> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                NeonText(
-                  text: isCyberpunk ? 'DATA VAULT' : 'Documents',
-                  color: accentColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  glowIntensity: 0.8,
-                ),
-                Text(
-                  isCyberpunk
-                      ? '${provider.documentCount} FILES LOADED'
-                      : '${provider.documentCount} files',
-                  style: AppTheme.getBodyTextStyle(
-                    fontSize: 11,
-                    color: AppTheme.themeTextSecondary,
-                  ),
-                ),
-              ],
+            child: Consumer<ChatProvider>(
+              builder: (context, chatProvider, child) {
+                final isClassroom = chatProvider.isClassroomContext;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    NeonText(
+                      text: isCyberpunk ? 'DATA VAULT' : 'Documents',
+                      color: accentColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      glowIntensity: 0.8,
+                    ),
+                    Text(
+                      isClassroom
+                          ? (isCyberpunk
+                              ? '${provider.documentCount} CLASSROOM FILES'
+                              : '${provider.documentCount} classroom files')
+                          : (isCyberpunk
+                              ? '${provider.documentCount} FILES LOADED'
+                              : '${provider.documentCount} files'),
+                      style: AppTheme.getBodyTextStyle(
+                        fontSize: 11,
+                        color: AppTheme.themeTextSecondary,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           // Add document button

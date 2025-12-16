@@ -57,7 +57,7 @@ class RAGPipeline:
         
         logger.info("RAG Pipeline initialized")
     
-    def ingest_file(self, file_path: Path, document_id: str = None) -> dict:
+    def ingest_file(self, file_path: Path, document_id: str = None, classroom_id: str = None) -> dict:
         """
         Ingest a file into the RAG system.
         
@@ -66,6 +66,7 @@ class RAGPipeline:
         Args:
             file_path: Path to the file
             document_id: Optional document ID (auto-generated if not provided)
+            classroom_id: Optional classroom ID for document isolation
             
         Returns:
             Ingestion result with document info
@@ -73,7 +74,7 @@ class RAGPipeline:
         document_id = document_id or str(uuid.uuid4())
         extension = file_path.suffix.lower().lstrip(".")
         
-        logger.info(f"Ingesting file: {file_path.name} (type: {extension})")
+        logger.info(f"Ingesting file: {file_path.name} (type: {extension}, classroom: {classroom_id})")
         
         # Check if extension is supported
         if extension not in self.processors:
@@ -83,6 +84,10 @@ class RAGPipeline:
             # Step 1: Process document
             processor = self.processors[extension]
             document = processor.process(file_path, document_id)
+            
+            # Add classroom_id to document metadata
+            if classroom_id:
+                document.metadata["classroom_id"] = classroom_id
             
             # Step 2: Chunk document
             document = self.chunker.chunk_document(document)
@@ -112,24 +117,29 @@ class RAGPipeline:
                 "message": str(e),
             }
     
-    def ingest_url(self, url: str, document_id: str = None) -> dict:
+    def ingest_url(self, url: str, document_id: str = None, classroom_id: str = None) -> dict:
         """
         Ingest content from a URL.
         
         Args:
             url: URL to scrape
             document_id: Optional document ID
+            classroom_id: Optional classroom ID for document isolation
             
         Returns:
             Ingestion result
         """
         document_id = document_id or str(uuid.uuid4())
         
-        logger.info(f"Ingesting URL: {url}")
+        logger.info(f"Ingesting URL: {url} (classroom: {classroom_id})")
         
         try:
             # Scrape URL
             document = self.web_scraper.scrape(url, document_id)
+            
+            # Add classroom_id to document metadata
+            if classroom_id:
+                document.metadata["classroom_id"] = classroom_id
             
             # Chunk document
             document = self.chunker.chunk_document(document)

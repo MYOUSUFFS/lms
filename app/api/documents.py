@@ -56,6 +56,7 @@ def get_document_type(extension: str) -> DocumentType:
 async def upload_document(
     file: UploadFile = File(..., description="Document file to upload"),
     document_id: Optional[str] = Query(None, description="Custom document ID"),
+    classroom_id: Optional[str] = Query(None, description="Classroom ID for document isolation"),
     _: str = Depends(verify_api_key),
 ):
     """
@@ -94,7 +95,7 @@ async def upload_document(
     
     # Process document
     pipeline = get_rag_pipeline()
-    result = pipeline.ingest_file(upload_path, doc_id)
+    result = pipeline.ingest_file(upload_path, doc_id, classroom_id=classroom_id)
     
     return DocumentUploadResponse(
         document_id=result["document_id"],
@@ -103,6 +104,7 @@ async def upload_document(
         status=ProcessingStatus.COMPLETED if result["status"] == "completed" else ProcessingStatus.FAILED,
         message=result["message"],
         chunks_created=result["chunks_created"],
+        classroom_id=classroom_id,
     )
 
 
@@ -151,6 +153,7 @@ async def list_documents(
             document_type=get_document_type(doc["filename"].split(".")[-1] if "." in doc["filename"] else "txt"),
             status=ProcessingStatus.COMPLETED,
             chunks_count=doc["chunks_count"],
+            classroom_id=doc.get("classroom_id"),
             created_at=datetime.now(),  # Would need to store this
         )
         for doc in documents
@@ -184,6 +187,7 @@ async def get_document(
                 document_type=get_document_type(doc["filename"].split(".")[-1] if "." in doc["filename"] else "txt"),
                 status=ProcessingStatus.COMPLETED,
                 chunks_count=doc["chunks_count"],
+                classroom_id=doc.get("classroom_id"),
                 created_at=datetime.now(),
             )
     
